@@ -118,6 +118,9 @@
     }
   },
   "ui": {
+    "Share your mascots": "Chia sẻ linh vật của bạn",
+    "Press “Share…” on a mascot to save it as a file, then post it on the Discord. You'll find other people's mascots there too.": "Nhấn “Chia sẻ…” trên một linh vật để lưu thành tệp, rồi đăng lên Discord. Bạn cũng sẽ tìm thấy linh vật của người khác ở đó.",
+    "Share on Discord": "Chia sẻ trên Discord",
     "Rename": "Đổi tên",
     "Rename this mascot": "Đổi tên linh vật này",
     "Share…": "Chia sẻ…",

@@ -27,7 +27,7 @@ function logo() {
   return icon;
 }
 
-export function discordButton({ small = false } = {}) {
+export function discordButton({ small = false, label = "Join the Discord" } = {}) {
   return el(
     "button",
     {
@@ -35,6 +35,6 @@ export function discordButton({ small = false } = {}) {
       onclick: () => call("open_url", { url: DISCORD_INVITE }),
     },
     logo(),
-    "Join the Discord",
+    label,
   );
 }

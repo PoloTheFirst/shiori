@@ -1418,6 +1418,14 @@
   margin-top: 4px;
 }
 
+.mascot-community {
+  margin-top: 18px;
+}
+
+.mascot-community > div {
+  flex: 1 1 320px;
+}
+
 .mascot-options {
   margin-top: 18px;
 }

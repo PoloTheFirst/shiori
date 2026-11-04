@@ -118,6 +118,9 @@
     }
   },
   "ui": {
+    "Share your mascots": "分享你的吉祥物",
+    "Press “Share…” on a mascot to save it as a file, then post it on the Discord. You'll find other people's mascots there too.": "在吉祥物上按「分享…」存成檔案,然後貼到 Discord。你也能在那裡找到別人的吉祥物。",
+    "Share on Discord": "在 Discord 分享",
     "Rename": "重新命名",
     "Rename this mascot": "重新命名這個吉祥物",
     "Share…": "分享…",

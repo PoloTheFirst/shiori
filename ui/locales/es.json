@@ -118,6 +118,9 @@
     }
   },
   "ui": {
+    "Share your mascots": "Comparte tus mascotas",
+    "Press “Share…” on a mascot to save it as a file, then post it on the Discord. You'll find other people's mascots there too.": "Pulsa «Compartir…» en una mascota para guardarla como archivo y publícala en el Discord. Allí también encontrarás las mascotas de los demás.",
+    "Share on Discord": "Compartir en Discord",
     "Rename": "Cambiar nombre",
     "Rename this mascot": "Cambiar el nombre de esta mascota",
     "Share…": "Compartir…",

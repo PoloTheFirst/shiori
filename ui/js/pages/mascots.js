@@ -5,6 +5,7 @@ import { store, subscribe } from "../store.js";
 import { call, confirmButton, openDialog, toast, toggle } from "../ui.js";
 import { t } from "../i18n.js";
 import { hotkeyInput } from "../components/hotkey-input.js";
+import { discordButton } from "../components/discord-button.js";
 
 const TEMPLATE = `
   <div class="page-head">
@@ -20,6 +21,17 @@ const TEMPLATE = `
     app, right-click for more. A PNG with a transparent background looks best.
   </p>
   <div class="mascot-grid" data-id="grid"></div>
+
+  <div class="card community mascot-community">
+    <div>
+      <b>Share your mascots</b>
+      <div class="muted small-text">
+        Press “Share…” on a mascot to save it as a file, then post it on the Discord. You'll find
+        other people's mascots there too.
+      </div>
+    </div>
+    <span data-id="discord-slot"></span>
+  </div>
 
   <div class="card mascot-options">
     <div class="card-title"><b>Options</b></div>
@@ -68,6 +80,7 @@ function build(container) {
   root = container;
   root.append(html(TEMPLATE));
   part("add").onclick = addMascot;
+  part("discord-slot").append(discordButton({ label: "Share on Discord" }));
   subscribe("settings", () => root.classList.contains("active") && load());
 }
 
