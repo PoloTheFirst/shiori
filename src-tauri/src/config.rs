@@ -174,6 +174,57 @@ fn read_yaml(path: &Path) -> Option<Map<String, Value>> {
     }
 }
 
+const SETTINGS_FILE: &str = "config.yaml";
+const LAST_GOOD_FILE: &str = "config.last-good.yaml";
+const READ_TRIES: u32 = 5;
+
+enum Settings {
+    Missing,
+    Read(Map<String, Value>),
+    Unreadable,
+}
+
+fn read_settings(path: &Path) -> Settings {
+    for attempt in 0..READ_TRIES {
+        if !path.exists() {
+            return Settings::Missing;
+        }
+        match fs::read_to_string(path) {
+            Ok(text) => {
+                return match serde_yaml::from_str::<Value>(&text) {
+                    Ok(Value::Object(map)) => Settings::Read(map),
+                    _ => Settings::Unreadable,
+                }
+            }
+            Err(_) if attempt + 1 < READ_TRIES => std::thread::sleep(std::time::Duration::from_millis(200)),
+            Err(_) => {}
+        }
+    }
+    Settings::Unreadable
+}
+
+fn saved_settings(dir: &Path) -> Map<String, Value> {
+    let path = dir.join(SETTINGS_FILE);
+    let last_good = dir.join(LAST_GOOD_FILE);
+    match read_settings(&path) {
+        Settings::Missing => Map::new(),
+        Settings::Read(map) => {
+            let _ = fs::copy(&path, &last_good);
+            map
+        }
+        Settings::Unreadable => {
+            let _ = fs::copy(&path, dir.join(format!("config.broken-{}.yaml", now())));
+            match read_settings(&last_good) {
+                Settings::Read(map) => {
+                    eprintln!("config.yaml couldn't be read, using the last good copy");
+                    map
+                }
+                _ => Map::new(),
+            }
+        }
+    }
+}
+
 fn write_yaml(path: &Path, data: &Map<String, Value>) -> std::io::Result<()> {
     if let Some(dir) = path.parent() {
         fs::create_dir_all(dir)?;
@@ -299,7 +350,7 @@ impl Config {
         let _ = fs::create_dir_all(dir.join("cache").join("covers"));
         let _ = fs::create_dir_all(dir.join("cache").join("vndb"));
         let mut data = defaults();
-        for (k, v) in read_yaml(&dir.join("config.yaml")).unwrap_or_default() {
+        for (k, v) in saved_settings(dir) {
             match (data.get_mut(&k), v) {
                 (Some(Value::Object(base)), Value::Object(over)) => base.extend(over),
                 (_, v) => {
@@ -349,7 +400,8 @@ impl Config {
     }
 
     pub fn save(&self) -> std::io::Result<()> {
-        write_yaml(&self.dir.join("config.yaml"), &self.data)
+        write_yaml(&self.dir.join(SETTINGS_FILE), &self.data)?;
+        write_yaml(&self.dir.join(LAST_GOOD_FILE), &self.data)
     }
 
     pub fn data(&self) -> &Map<String, Value> {
@@ -818,5 +870,23 @@ mod tests {
         let entry = cfg.game("vn");
         assert_eq!(entry["hourly"][this_hour()], 120);
         assert_eq!(entry["daily"][today()], 120);
+    }
+    #[test]
+    fn a_broken_settings_file_falls_back_to_the_last_good_one() {
+        let dir = std::env::temp_dir().join(format!("vnrpc-test-broken-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        let mut cfg = Config::load(&dir);
+        cfg.update(Map::from_iter([("theme".into(), json!("rosepine"))])).unwrap();
+        assert_eq!(Config::load(&dir).str("theme"), "rosepine");
+
+        fs::write(dir.join(SETTINGS_FILE), "theme: [oops").unwrap();
+        let cfg = Config::load(&dir);
+        assert_eq!(cfg.str("theme"), "rosepine");
+        let broken = fs::read_dir(&dir)
+            .unwrap()
+            .flatten()
+            .any(|e| e.file_name().to_string_lossy().starts_with("config.broken-"));
+        assert!(broken);
+        let _ = fs::remove_dir_all(&dir);
     }
 }
