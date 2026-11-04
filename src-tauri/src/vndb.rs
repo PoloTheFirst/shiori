@@ -9,7 +9,7 @@ use serde_json::{json, Value};
 
 const API: &str = "https://api.vndb.org/kana";
 const USER_AGENT: &str = concat!("ShioriRPC/", env!("CARGO_PKG_VERSION"));
-const MIN_INTERVAL: Duration = Duration::from_millis(1100);
+const MIN_INTERVAL: Duration = Duration::from_millis(500);
 const FIELDS: &str =
     "id,title,alttitle,titles.title,titles.latin,aliases,released,rating,length_minutes,image.url,image.dims,image.sexual,image.violence";
 
@@ -35,7 +35,7 @@ pub struct VnResult {
     pub other_titles: Vec<String>,
 }
 
-fn is_nsfw(image: &Value) -> bool {
+pub(crate) fn is_nsfw(image: &Value) -> bool {
     let sexual = image["sexual"].as_f64().unwrap_or(0.0);
     let violence = image["violence"].as_f64().unwrap_or(0.0);
     sexual >= 1.0 || violence >= 1.0
@@ -113,7 +113,7 @@ fn fresh(path: &Path, days: u64) -> bool {
     age.is_some_and(|age| age < Duration::from_secs(days * 86400))
 }
 
-fn read_cached(path: &Path, days: u64) -> Option<Value> {
+pub(crate) fn read_cached(path: &Path, days: u64) -> Option<Value> {
     if !fresh(path, days) {
         return None;
     }
@@ -209,7 +209,7 @@ impl Vndb {
         Err("rate limited, giving up".into())
     }
 
-    fn post(&self, endpoint: &str, body: &Value) -> Result<Value, String> {
+    pub(crate) fn post(&self, endpoint: &str, body: &Value) -> Result<Value, String> {
         self.request(Method::POST, endpoint, Some(body), "")
     }
 
@@ -413,6 +413,28 @@ impl Vndb {
         let endpoint = format!("/ulist/{}", vn_id(id));
         self.request(Method::PATCH, &endpoint, Some(changes), token)?;
         Ok(())
+    }
+
+    pub fn list_votes(&self, token: &str) -> Result<Vec<(String, i64)>, String> {
+        let user = self.token_user(token)?;
+        let mut out = Vec::new();
+        for page in 1..=50 {
+            let body = json!({
+                "user": user["id"],
+                "fields": "vote",
+                "sort": "id",
+                "results": 100,
+                "page": page,
+            });
+            let data = self.request(Method::POST, "/ulist", Some(&body), token)?;
+            for entry in data["results"].as_array().into_iter().flatten() {
+                out.push((text(&entry["id"]), entry["vote"].as_i64().unwrap_or(0)));
+            }
+            if data["more"].as_bool() != Some(true) {
+                break;
+            }
+        }
+        Ok(out)
     }
 
     pub fn wishlist(&self, token: &str) -> Result<Vec<VnResult>, String> {

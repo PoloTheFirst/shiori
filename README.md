@@ -79,7 +79,7 @@ The app updates itself and shows what changed after each update. Full guide: [In
 |---|---|
 | **Discord** | Chapter, route or ending read from the window title · original or romanized title · privacy per VN (everything, no chapter, just “Visual Novel”, or nothing) · NSFW covers stay hidden unless you allow them |
 | **Reading** | Time read per VN and per day · calendar and streaks · progress against the VNDB length · status and rating · description and characters from VNDB |
-| **VNDB** | List sync · random pick from your wishlist when you can't decide |
+| **VNDB** | List sync · random pick from your wishlist when you can't decide · recommendations based on the VNs you liked |
 | **Playing** | Play button and desktop shortcuts, through Steam, Locale Emulator or NTLEA |
 | **Make it yours** | 16 themes or your own colors · your own background image · 8 languages: English, French, Spanish, Portuguese (Brazil), Russian, Japanese, Vietnamese, Traditional Chinese |
 

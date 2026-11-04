@@ -194,6 +194,15 @@ pub fn remove_game(shared: SharedState, key: String) -> Result<(), String> {
 }
 
 #[tauri::command]
+pub async fn recommendations(
+    shared: SharedState<'_>,
+    refresh: bool,
+) -> Result<crate::reco::Recommendations, String> {
+    let shared = Arc::clone(&shared);
+    blocking(move || crate::reco::recommendations(&shared, refresh)).await
+}
+
+#[tauri::command]
 pub async fn import_vndb_finished(shared: SharedState<'_>) -> Result<usize, String> {
     let shared = Arc::clone(&shared);
     blocking(move || vndb_list::import_finished(&shared)).await

@@ -28,6 +28,7 @@ mod crash;
 mod lang;
 mod mascot;
 mod personalities;
+mod reco;
 mod screenshots;
 mod updater;
 
@@ -215,6 +216,7 @@ fn main() {
             commands::library::confirm_match,
             commands::library::match_checked,
             commands::library::import_vndb_finished,
+            commands::library::recommendations,
             commands::library::set_game_path,
             commands::library::set_tool_path,
             commands::library::play_game,

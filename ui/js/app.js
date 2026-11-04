@@ -16,6 +16,7 @@ import "./pages/cover.js";
 import "./pages/library.js";
 import "./pages/game.js";
 import "./pages/wishlist.js";
+import "./pages/foryou.js";
 import "./pages/screenshots.js";
 import "./pages/share.js";
 import "./pages/mascots.js";
