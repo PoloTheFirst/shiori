@@ -1380,6 +1380,32 @@
 
 .mascot-meta b {
   color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.mascot-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mascot-meta .mascot-rename {
+  flex: none;
+  align-self: center;
+  margin: 0;
+  padding: 2px 6px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mascot-rename:hover {
+  background: var(--surface-hover);
+  color: var(--text);
 }
 
 .mascot-card.on .mascot-meta span {

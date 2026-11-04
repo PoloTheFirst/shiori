@@ -118,6 +118,8 @@
     }
   },
   "ui": {
+    "Rename": "Đổi tên",
+    "Rename this mascot": "Đổi tên linh vật này",
     "Share…": "Chia sẻ…",
     "Images or shared mascots": "Ảnh hoặc linh vật được chia sẻ",
     "Shared mascot": "Linh vật được chia sẻ",

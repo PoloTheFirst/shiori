@@ -118,6 +118,8 @@
     }
   },
   "ui": {
+    "Rename": "Переименовать",
+    "Rename this mascot": "Переименовать маскота",
     "Share…": "Поделиться…",
     "Images or shared mascots": "Изображения или общие маскоты",
     "Shared mascot": "Общий маскот",

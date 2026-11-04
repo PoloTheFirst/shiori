@@ -118,6 +118,8 @@
     }
   },
   "ui": {
+    "Rename": "Renomear",
+    "Rename this mascot": "Renomear este mascote",
     "Share…": "Compartilhar…",
     "Images or shared mascots": "Imagens ou mascotes compartilhados",
     "Shared mascot": "Mascote compartilhado",

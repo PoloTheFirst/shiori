@@ -188,7 +188,7 @@ pub fn gallery(shared: &Shared) -> Vec<GalleryItem> {
 
     let mut items = vec![GalleryItem {
         id: BUILT_IN_ID.into(),
-        name: "Default".into(),
+        name: name_of(shared, BUILT_IN_ID),
         file: String::new(),
         shown: is_shown(BUILT_IN_ID),
         built_in: true,
@@ -200,7 +200,7 @@ pub fn gallery(shared: &Shared) -> Vec<GalleryItem> {
     for path in gallery_files(shared) {
         let id = path.file_stem().unwrap_or_default().to_string_lossy().to_string();
         items.push(GalleryItem {
-            name: id.replace('_', " "),
+            name: name_of(shared, &id),
             file: path.to_string_lossy().to_string(),
             shown: is_shown(&id),
             built_in: false,
@@ -500,6 +500,7 @@ pub fn remove_from_gallery(shared: &Shared, id: &str) -> Result<(), String> {
         std::fs::remove_file(file).map_err(|e| e.to_string())?;
     }
     let _ = std::fs::remove_dir_all(voices_dir(shared, id));
+    set_name(shared, id, "");
     Ok(())
 }
 
@@ -871,6 +872,46 @@ fn save_positions(app: &AppHandle) {
 
 pub fn speaker() -> Option<String> {
     SPEAKER.lock().unwrap().clone()
+}
+
+pub(crate) const MAX_NAME: usize = 60;
+
+pub(crate) fn name_of(shared: &Shared, id: &str) -> String {
+    let saved = shared
+        .config
+        .lock()
+        .unwrap()
+        .get("mascot_names")
+        .and_then(|all| all.get(id))
+        .and_then(Value::as_str)
+        .map(String::from);
+    match saved {
+        Some(name) => name,
+        None if id == BUILT_IN_ID => "Default".into(),
+        None => id.replace('_', " "),
+    }
+}
+
+pub(crate) fn clean_name(name: &str) -> String {
+    name.trim().chars().filter(|c| !c.is_control()).take(MAX_NAME).collect::<String>().trim().to_string()
+}
+
+pub fn set_name(shared: &Shared, id: &str, name: &str) {
+    let name = clean_name(name);
+    let mut all = shared
+        .config
+        .lock()
+        .unwrap()
+        .get("mascot_names")
+        .and_then(Value::as_object)
+        .cloned()
+        .unwrap_or_default();
+    if name.is_empty() {
+        all.remove(id);
+    } else {
+        all.insert(id.to_string(), json!(name));
+    }
+    save_settings(shared, Map::from_iter([("mascot_names".into(), Value::Object(all))]));
 }
 
 pub(crate) fn personality_of(shared: &Shared, id: &str) -> String {

@@ -230,6 +230,12 @@ function card(item, personalities) {
     editVoices(item);
   };
 
+  const rename = el("button", { class: "mascot-rename", title: "Rename" }, "✎");
+  rename.onclick = (event) => {
+    event.stopPropagation();
+    renameMascot(item);
+  };
+
   const share = el("button", { class: "btn secondary small" }, "Share…");
   share.onclick = (event) => {
     event.stopPropagation();
@@ -253,7 +259,7 @@ function card(item, personalities) {
     el(
       "div",
       { class: "mascot-meta" },
-      el("b", {}, item.name),
+      el("div", { class: "mascot-name" }, el("b", {}, item.name), rename),
       el("span", { class: "small-text" }, item.shown ? "On your desktop" : "Click to show"),
       el("div", { class: "mascot-size" }, sizeLabel, size),
       el(
@@ -399,6 +405,31 @@ async function editVoices(item) {
     actions: [{ label: "Done", value: true }],
   });
   preview?.pause();
+}
+
+async function renameMascot(item) {
+  const input = el("input", { type: "text", maxlength: 60, style: { width: "100%", boxSizing: "border-box" } });
+  input.value = t(item.name);
+  const answer = await openDialog({
+    title: "Rename this mascot",
+    body: input,
+    actions: [
+      { label: "Cancel", kind: "secondary", value: null },
+      { label: "Save", value: "save" },
+    ],
+    onOpen: (finish) => {
+      input.select();
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          finish("save");
+        }
+      });
+    },
+  });
+  const name = input.value.trim();
+  if (answer === "save" && name && name !== t(item.name)) {
+    await call("rename_mascot", { id: item.id, name });
+  }
 }
 
 async function shareMascot(item) {

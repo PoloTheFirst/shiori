@@ -102,6 +102,12 @@ pub fn remove_mascot(app: AppHandle, shared: SharedState, id: String) -> Result<
 }
 
 #[tauri::command(async)]
+pub fn rename_mascot(app: AppHandle, shared: SharedState, id: String, name: String) {
+    mascot::set_name(&shared, &id, &name);
+    mascot::refresh(&app);
+}
+
+#[tauri::command(async)]
 pub fn ui_language(shared: SharedState) -> &'static str {
     crate::lang::resolve(&shared.config.lock().unwrap().str("language"))
 }

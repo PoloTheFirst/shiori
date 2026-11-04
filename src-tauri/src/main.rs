@@ -268,6 +268,7 @@ fn main() {
             commands::popups::cancel_cutout_download,
             commands::popups::remove_cutout,
             commands::popups::remove_mascot,
+            commands::popups::rename_mascot,
             commands::popups::show_mascot,
             commands::popups::set_mascot_size,
             commands::popups::mascot_personalities,

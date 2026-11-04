@@ -54,6 +54,7 @@ fn defaults() -> Map<String, Value> {
         "mascot_shown": [],
         "mascot_positions": {},
         "mascot_sizes": {},
+        "mascot_names": {},
         "mascot_personalities": {},
         "mascot_custom_lines": {},
         "mascot_view_only": {},

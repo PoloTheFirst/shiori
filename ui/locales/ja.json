@@ -118,6 +118,8 @@
     }
   },
   "ui": {
+    "Rename": "名前を変更",
+    "Rename this mascot": "このマスコットの名前を変更",
     "Share…": "共有…",
     "Images or shared mascots": "画像または共有マスコット",
     "Shared mascot": "共有マスコット",

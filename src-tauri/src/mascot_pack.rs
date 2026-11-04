@@ -20,7 +20,6 @@ const MAX_MANIFEST: u64 = 256 * 1024;
 const MAX_IMAGE: u64 = 40 * 1024 * 1024;
 const MAX_VOICE: u64 = 20 * 1024 * 1024;
 const MAX_VOICES: usize = 100;
-const MAX_NAME: usize = 60;
 const MAX_LINE: usize = 300;
 const MAX_LIST: usize = 20;
 
@@ -39,7 +38,7 @@ pub fn export(shared: &Shared, id: &str, dest: &Path) -> Result<(), String> {
         let ext = file.extension().unwrap_or_default().to_string_lossy().to_lowercase();
         (fs::read(&file).map_err(|e| e.to_string())?, ext)
     };
-    let name = if id == BUILT_IN_ID { "Default".to_string() } else { id.replace('_', " ") };
+    let name = mascot::name_of(shared, id);
     let image_name = format!("image.{ext}");
     let manifest = json!({
         "format": FORMAT,
@@ -133,6 +132,7 @@ fn import_into(
     let staged = staging.join(format!("{}.{ext}", safe_filename(&name.to_lowercase())));
     fs::write(&staged, image).map_err(|e| e.to_string())?;
     let id = mascot::add_to_gallery(shared, &staged)?;
+    mascot::set_name(shared, &id, name);
 
     if let Some(height) = manifest["height"].as_u64() {
         mascot::set_height(shared, &id, height.min(u64::from(u32::MAX)) as u32);
@@ -198,7 +198,7 @@ fn read_limited(zip: &mut ZipArchive<File>, name: &str, limit: u64) -> Result<Ve
 }
 
 fn clean_name(name: &str) -> String {
-    let name: String = name.trim().chars().filter(|c| !c.is_control()).take(MAX_NAME).collect();
+    let name = mascot::clean_name(name);
     if name.is_empty() {
         "mascot".into()
     } else {
@@ -264,7 +264,7 @@ mod tests {
     fn names_are_trimmed_and_never_empty() {
         assert_eq!(clean_name("  Kud\n "), "Kud");
         assert_eq!(clean_name(""), "mascot");
-        assert_eq!(clean_name(&"x".repeat(200)).len(), MAX_NAME);
+        assert_eq!(clean_name(&"x".repeat(200)).len(), mascot::MAX_NAME);
     }
 
     #[test]

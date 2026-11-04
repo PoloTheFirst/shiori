@@ -118,6 +118,8 @@
     }
   },
   "ui": {
+    "Rename": "重新命名",
+    "Rename this mascot": "重新命名這個吉祥物",
     "Share…": "分享…",
     "Images or shared mascots": "圖片或分享的吉祥物",
     "Shared mascot": "分享的吉祥物",
