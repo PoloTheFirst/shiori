@@ -3759,7 +3759,7 @@ dependencies = [
 
 [[package]]
 name = "shiori"
-version = "2.2.1"
+version = "2.2.2"
 dependencies = [
  "base64 0.23.1",
  "chrono",
