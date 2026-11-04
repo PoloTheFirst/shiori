@@ -1,10 +1,12 @@
 import { el, svg } from "../dom.js";
-import { invoke } from "../tauri.js";
-import { call } from "../ui.js";
+import { invoke, listen } from "../tauri.js";
+import { call, openDialog, toast } from "../ui.js";
 import { store } from "../store.js";
 import { dayMonth } from "../format.js";
 import { t } from "../i18n.js";
 import { raw, vndbText } from "./util.js";
+
+let basicCutout = false;
 
 const ROLES = {
   main: "Protagonist",
@@ -62,7 +64,87 @@ function characterCard(char, role) {
   icon.append(svg("path", { d: "M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" }));
   const open = el("button", { class: "labs-char-link", title: "View on VNDB" }, icon);
   open.onclick = () => call("open_url", { url: `https://vndb.org/${char.id}` });
-  return el("div", { class: "labs-char" }, picture, info, open);
+  return el("div", { class: "labs-char" }, picture, info, mascotButton(char), open);
+}
+
+function mascotButton(char) {
+  const image = char.image;
+  if (!image?.url || image.sexual >= 1 || image.violence >= 1) {
+    return null;
+  }
+  const icon = svg("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" });
+  icon.append(svg("path", { d: "M22 11v1a10 10 0 1 1-9-10M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01M16 5h6M19 2v6" }));
+  const button = el("button", { class: "labs-char-link labs-char-mascot", title: "Add as mascot" }, icon);
+  button.onclick = async () => {
+    button.disabled = true;
+    try {
+      if (!(await prepareCutout())) {
+        return;
+      }
+      const aiFailed = await call("add_character_mascot", { name: char.name, url: image.url });
+      const done = aiFailed ? "{name} is now a mascot, with the basic cutout" : "{name} is now a mascot";
+      toast(t(done, { name: char.name }));
+    } finally {
+      button.disabled = false;
+    }
+  };
+  return button;
+}
+
+async function prepareCutout() {
+  if (basicCutout || (await invoke("cutout_ready"))) {
+    return true;
+  }
+  const answer = await openDialog({
+    title: "Cleaner mascots with AI",
+    body: el(
+      "p",
+      { class: "muted" },
+      "An AI model cuts the character out much more cleanly. It runs on your PC and your pictures " +
+        "stay there. It downloads once: about 250 MB, then 185 MB on your disk.",
+    ),
+    actions: [
+      { label: "Not now", kind: "secondary", value: "basic" },
+      { label: "Download", value: "download" },
+    ],
+  });
+  if (answer === "basic") {
+    basicCutout = true;
+    return true;
+  }
+  return answer === "download" && downloadCutout();
+}
+
+async function downloadCutout() {
+  const label = el("b", {}, "Downloading the AI model…");
+  const fill = el("i", { style: { width: "0%" } });
+  let closeDialog;
+  const dialog = openDialog({
+    title: "Cleaner mascots with AI",
+    body: el("div", { class: "reco-loading" }, label, el("div", { class: "bar" }, fill)),
+    actions: [{ label: "Cancel", kind: "secondary", value: "cancel" }],
+    onOpen: (finish) => (closeDialog = finish),
+  });
+  const stopListening = await listen("cutout-progress", ({ payload }) => {
+    label.textContent = t("Downloading the AI model… {done} / {total} MB", payload);
+    fill.style.width = `${payload.percent}%`;
+  });
+  dialog.then((value) => value !== "done" && invoke("cancel_cutout_download"));
+  try {
+    const finished = await invoke("download_cutout");
+    closeDialog("done");
+    return finished;
+  } catch (error) {
+    closeDialog("done");
+    basicCutout = true;
+    await openDialog({
+      title: "Cleaner mascots with AI",
+      body: el("p", { class: "muted" }, String(error)),
+    });
+    return true;
+  } finally {
+    stopListening();
+  }
 }
 
 async function renderCharacters(vnId, box) {

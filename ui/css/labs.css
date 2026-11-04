@@ -262,7 +262,11 @@ html.labs-compact #pause-btn {
 }
 
 .labs-char-info {
-  padding-right: 22px;
+  padding-right: 52px;
+}
+
+.labs-char-link.labs-char-mascot {
+  right: 36px;
 }
 
 .labs-char-link {

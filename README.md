@@ -187,4 +187,5 @@ The engine is in Rust (`src-tauri/src`). The interface is plain HTML, CSS and Ja
 ## Credits
 
 - **[VNDB](https://vndb.org)**: visual novel data, covers, characters, lengths and list sync come from the VNDB API. Covers and game screenshots in these images come from VNDB and belong to their publishers.
+- **AI cutouts**: the optional mascot cutout downloads [anime-seg](https://github.com/SkyTNT/anime-segmentation) by SkyTNT (Apache-2.0) and [ONNX Runtime](https://github.com/microsoft/onnxruntime) by Microsoft (MIT) from their own pages, only after you agree.
 - **Flags**: the language flags come from [osu-resources](https://github.com/ppy/osu-resources) by ppy, licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/).

@@ -25,6 +25,7 @@ mod backup;
 mod images;
 mod launcher;
 mod crash;
+mod cutout;
 mod lang;
 mod mascot;
 mod personalities;
@@ -135,6 +136,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         }
         updater::clean_leftovers();
     }
+    cutout::clean_unfinished(&shared);
     tray::build(app.handle())?;
     mascot::apply_settings(app.handle());
     mascot::start_chatter(app.handle());
@@ -258,6 +260,11 @@ fn main() {
             commands::popups::mascot_menu,
             commands::popups::list_mascots,
             commands::popups::add_mascot,
+            commands::popups::add_character_mascot,
+            commands::popups::cutout_ready,
+            commands::popups::download_cutout,
+            commands::popups::cancel_cutout_download,
+            commands::popups::remove_cutout,
             commands::popups::remove_mascot,
             commands::popups::show_mascot,
             commands::popups::set_mascot_size,

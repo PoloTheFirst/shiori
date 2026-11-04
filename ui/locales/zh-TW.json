@@ -118,6 +118,18 @@
     }
   },
   "ui": {
+    "{name} is now a mascot, with the basic cutout": "{name} 現在是吉祥物了,使用基本去背",
+    "The AI model needs the Microsoft Visual C++ Redistributable. Install it, then try again. For now, the basic cutout is used.": "AI 模型需要 Microsoft Visual C++ Redistributable。請安裝後再試一次。目前先使用基本去背。",
+    "Cleaner mascots with AI": "用 AI 讓吉祥物更乾淨",
+    "An AI model cuts the character out much more cleanly. It runs on your PC and your pictures stay there. It downloads once: about 250 MB, then 185 MB on your disk.": "AI 模型能更乾淨地去背角色。它在你的電腦上執行,圖片也只留在電腦裡。只需下載一次:約 250 MB,之後佔用 185 MB 磁碟空間。",
+    "Not now": "現在不要",
+    "Download": "下載",
+    "Downloading the AI model…": "正在下載 AI 模型…",
+    "Downloading the AI model… {done} / {total} MB": "正在下載 AI 模型… {done} / {total} MB",
+    "Couldn't download the AI model. Using the basic cutout.": "無法下載 AI 模型,改用基本去背。",
+    "AI model for cutouts (185 MB)": "去背用 AI 模型 (185 MB)",
+    "Add as mascot": "新增為吉祥物",
+    "{name} is now a mascot": "{name} 現在是吉祥物了",
     "VNDB limited the number of requests, so this list may be incomplete. Try Refresh in a few minutes.": "VNDB 限制了請求次數，此清單可能不完整。請在幾分鐘後重新整理。",
     "Combined": "綜合",
     "Tags": "標籤",

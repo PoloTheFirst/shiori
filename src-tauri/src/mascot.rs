@@ -14,6 +14,7 @@ use tauri::{
 };
 
 use crate::config::safe_filename;
+use crate::cutout;
 use crate::lang;
 use crate::personalities::{self, Lines};
 use crate::state::{Shared, Snapshot};
@@ -56,6 +57,14 @@ const SILENT_LIMIT: Duration = Duration::from_secs(90);
 
 const MIN_HEIGHT: u32 = 80;
 const MAX_HEIGHT: u32 = 1500;
+const BACKGROUND_TOLERANCE: u32 = 36;
+const MIN_FLAT_BORDER: f64 = 0.6;
+const MAX_CLEARED: f64 = 0.9;
+const MAX_UPSCALE: u32 = 2;
+const LEAK_RADIUS: u32 = 2;
+const SMALL_POCKET: f64 = 0.006;
+const EDGE_WIDTH: usize = 3;
+const EDGE_CONTRAST: f64 = 170.0;
 
 fn shared(app: &AppHandle) -> Arc<Shared> {
     Arc::clone(&app.state::<Arc<Shared>>())
@@ -225,6 +234,261 @@ pub fn add_to_gallery(shared: &Shared, source: &Path) -> Result<String, String> 
     std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
     std::fs::copy(source, dir.join(format!("{id}.{ext}"))).map_err(|e| e.to_string())?;
     Ok(id)
+}
+
+fn close_colors(a: &image::Rgba<u8>, b: &image::Rgba<u8>) -> bool {
+    a.0.iter()
+        .take(3)
+        .zip(b.0.iter())
+        .map(|(x, y)| x.abs_diff(*y) as u32)
+        .sum::<u32>()
+        <= BACKGROUND_TOLERANCE
+}
+
+fn clear_flat_background(mut img: RgbaImage) -> RgbaImage {
+    let (width, height) = img.dimensions();
+    if width < 2 || height < 2 {
+        return img;
+    }
+    let background = *img.get_pixel(0, 0);
+    let border: Vec<(u32, u32)> = (0..width)
+        .flat_map(|x| [(x, 0), (x, height - 1)])
+        .chain((0..height).flat_map(|y| [(0, y), (width - 1, y)]))
+        .collect();
+    let flat = border
+        .iter()
+        .filter(|(x, y)| close_colors(img.get_pixel(*x, *y), &background))
+        .count();
+    if (flat as f64) < border.len() as f64 * MIN_FLAT_BORDER {
+        return img;
+    }
+
+    let open_background = background_mask(&img, &background);
+    let cleared = open_background.iter().filter(|is_background| **is_background).count();
+    if cleared as f64 > (width as u64 * height as u64) as f64 * MAX_CLEARED {
+        return img;
+    }
+    for (index, is_background) in open_background.iter().enumerate() {
+        if *is_background {
+            let (x, y) = (index as u32 % width, index as u32 / width);
+            img.get_pixel_mut(x, y).0[3] = 0;
+        }
+    }
+    if cleared > 0 {
+        soften_edges(&mut img, &background);
+        spread_colors_outward(&mut img);
+    }
+    img
+}
+
+fn grow_mask(mask: &[bool], width: u32, height: u32, keep: impl Fn(usize) -> bool) -> Vec<bool> {
+    let mut out = mask.to_vec();
+    let at = |x: u32, y: u32| (y * width + x) as usize;
+    for y in 0..height {
+        for x in 0..width {
+            if !mask[at(x, y)] {
+                continue;
+            }
+            for ny in y.saturating_sub(LEAK_RADIUS)..=(y + LEAK_RADIUS).min(height - 1) {
+                for nx in x.saturating_sub(LEAK_RADIUS)..=(x + LEAK_RADIUS).min(width - 1) {
+                    if keep(at(nx, ny)) {
+                        out[at(nx, ny)] = true;
+                    }
+                }
+            }
+        }
+    }
+    out
+}
+
+fn background_mask(img: &RgbaImage, background: &image::Rgba<u8>) -> Vec<bool> {
+    let (width, height) = img.dimensions();
+    let at = |x: u32, y: u32| (y * width + x) as usize;
+    let looks_like_it: Vec<bool> = img.pixels().map(|pixel| close_colors(pixel, background)).collect();
+
+    let not_it: Vec<bool> = looks_like_it.iter().map(|is_it| !is_it).collect();
+    let near_a_line = grow_mask(&not_it, width, height, |_| true);
+    let open_area: Vec<bool> = near_a_line.iter().map(|near| !near).collect();
+
+    let mut reached = vec![false; open_area.len()];
+    let mut pending: Vec<(u32, u32)> = (0..width)
+        .map(|x| (x, 0))
+        .chain((0..height).flat_map(|y| [(0, y), (width - 1, y)]))
+        .collect();
+    while let Some((x, y)) = pending.pop() {
+        let index = at(x, y);
+        if reached[index] || !open_area[index] {
+            continue;
+        }
+        reached[index] = true;
+        pending.extend(neighbours(x, y, width, height));
+    }
+
+    let mut mask = grow_mask(&reached, width, height, |index| looks_like_it[index]);
+    let small_pocket = (f64::from(width) * f64::from(height) * SMALL_POCKET) as usize;
+    let mut checked = mask.clone();
+    for start_y in 0..height {
+        for start_x in 0..width {
+            let start = at(start_x, start_y);
+            if checked[start] || !looks_like_it[start] {
+                continue;
+            }
+            let mut pocket = Vec::new();
+            let mut touches_background = false;
+            let mut pending = vec![(start_x, start_y)];
+            checked[start] = true;
+            while let Some((x, y)) = pending.pop() {
+                pocket.push(at(x, y));
+                for (nx, ny) in neighbours(x, y, width, height) {
+                    let index = at(nx, ny);
+                    touches_background |= mask[index];
+                    if !checked[index] && looks_like_it[index] {
+                        checked[index] = true;
+                        pending.push((nx, ny));
+                    }
+                }
+            }
+            if touches_background && pocket.len() < small_pocket {
+                for index in pocket {
+                    mask[index] = true;
+                }
+            }
+        }
+    }
+    mask
+}
+
+pub(crate) fn neighbours(x: u32, y: u32, width: u32, height: u32) -> impl Iterator<Item = (u32, u32)> {
+    [
+        (x.wrapping_sub(1), y),
+        (x + 1, y),
+        (x, y.wrapping_sub(1)),
+        (x, y + 1),
+    ]
+    .into_iter()
+    .filter(move |(nx, ny)| *nx < width && *ny < height)
+}
+
+fn soften_edges(img: &mut RgbaImage, background: &image::Rgba<u8>) {
+    let (width, height) = img.dimensions();
+    let mut near_edge: Vec<(u32, u32)> = img
+        .enumerate_pixels()
+        .filter(|(_, _, pixel)| pixel.0[3] == 0)
+        .map(|(x, y, _)| (x, y))
+        .collect();
+    let mut seen: std::collections::HashSet<(u32, u32)> = near_edge.iter().copied().collect();
+    let mut outline: std::collections::HashSet<(u32, u32)> = std::collections::HashSet::new();
+
+    for _ in 0..EDGE_WIDTH {
+        let mut next = Vec::new();
+        for (x, y) in near_edge {
+            for neighbour in neighbours(x, y, width, height) {
+                if seen.insert(neighbour) {
+                    next.push(neighbour);
+                }
+            }
+        }
+        for (x, y) in &next {
+            let pixel = img.get_pixel_mut(*x, *y);
+            let contrast = pixel.0.iter().take(3).zip(background.0.iter()).map(|(a, b)| a.abs_diff(*b)).max().unwrap_or(0);
+            let alpha = (f64::from(contrast) / EDGE_CONTRAST).min(1.0);
+            if alpha >= 1.0 {
+                outline.insert((*x, *y));
+                continue;
+            }
+            for channel in 0..3 {
+                let mixed = f64::from(pixel.0[channel]);
+                let behind = f64::from(background.0[channel]);
+                pixel.0[channel] = ((mixed - (1.0 - alpha) * behind) / alpha.max(0.05)).clamp(0.0, 255.0) as u8;
+            }
+            pixel.0[3] = (alpha * 255.0) as u8;
+        }
+        next.retain(|point| !outline.contains(point));
+        near_edge = next;
+    }
+}
+
+fn spread_colors_outward(img: &mut RgbaImage) {
+    let (width, height) = img.dimensions();
+    for _ in 0..EDGE_WIDTH + 1 {
+        let before = img.clone();
+        for (x, y, pixel) in img.enumerate_pixels_mut() {
+            if pixel.0[3] > 0 {
+                continue;
+            }
+            let colors: Vec<[u8; 4]> = neighbours(x, y, width, height)
+                .map(|(nx, ny)| before.get_pixel(nx, ny).0)
+                .filter(|color| color[3] > 0)
+                .collect();
+            if colors.is_empty() {
+                continue;
+            }
+            for channel in 0..3 {
+                let total: u32 = colors.iter().map(|color| u32::from(color[channel])).sum();
+                pixel.0[channel] = (total / colors.len() as u32) as u8;
+            }
+            pixel.0[3] = 1;
+        }
+    }
+    for pixel in img.pixels_mut() {
+        if pixel.0[3] == 1 {
+            pixel.0[3] = 0;
+        }
+    }
+}
+
+fn remove_background(shared: &Shared, picture: RgbaImage) -> (RgbaImage, bool) {
+    if !cutout::ready(shared) {
+        return (clear_flat_background(picture), false);
+    }
+    match cutout::cut(shared, &picture) {
+        Ok(cut) => (cut, false),
+        Err(error) => {
+            eprintln!("the AI cutout failed: {error}");
+            (clear_flat_background(picture), true)
+        }
+    }
+}
+
+pub fn add_character(shared: &Shared, name: &str, url: &str) -> Result<(String, bool), String> {
+    if !url.starts_with("https://t.vndb.org/") {
+        return Err("That image isn't from VNDB.".into());
+    }
+    let id = safe_filename(&name.to_lowercase());
+    if file_for(shared, &id).is_some() {
+        return Ok((id, false));
+    }
+
+    let bytes = shared.vndb.download(url)?;
+    let picture = image::load_from_memory(&bytes).map_err(|_| "That file isn't an image.".to_string())?;
+    let (picture, ai_failed) = remove_background(shared, picture.to_rgba8());
+    let height = picture.height();
+
+    let cache = shared.data_dir.join("cache");
+    std::fs::create_dir_all(&cache).map_err(|e| e.to_string())?;
+    let file = cache.join(format!("{id}.png"));
+    picture.save(&file).map_err(|e| e.to_string())?;
+    let added = add_to_gallery(shared, &file);
+    let _ = std::fs::remove_file(&file);
+    let id = added?;
+
+    set_height(shared, &id, height_for(shared, &id).min(height * MAX_UPSCALE));
+    Ok((id, ai_failed))
+}
+
+pub(crate) fn set_height(shared: &Shared, id: &str, height: u32) -> u32 {
+    let height = height.clamp(MIN_HEIGHT, MAX_HEIGHT);
+    let mut sizes = shared
+        .config
+        .lock()
+        .unwrap()
+        .get("mascot_sizes")
+        .and_then(Value::as_object)
+        .cloned()
+        .unwrap_or_default();
+    sizes.insert(id.to_string(), json!(height));
+    save_settings(shared, Map::from_iter([("mascot_sizes".into(), Value::Object(sizes))]));
+    height
 }
 
 pub fn remove_from_gallery(shared: &Shared, id: &str) -> Result<(), String> {
@@ -418,17 +682,7 @@ fn apply_now(app: &AppHandle) {
 pub fn resize(app: &AppHandle, id: &str, height: u32) -> Result<(), String> {
     crate::crash::note(format!("resize {id} to {height}"));
     let shared = shared(app);
-    let height = height.clamp(MIN_HEIGHT, MAX_HEIGHT);
-    let mut sizes = shared
-        .config
-        .lock()
-        .unwrap()
-        .get("mascot_sizes")
-        .and_then(Value::as_object)
-        .cloned()
-        .unwrap_or_default();
-    sizes.insert(id.to_string(), json!(height));
-    save_settings(&shared, Map::from_iter([("mascot_sizes".into(), Value::Object(sizes))]));
+    let height = set_height(&shared, id, height);
 
     let _applying = APPLYING.lock().unwrap();
     let label = format!("{WINDOW_PREFIX}{id}");
@@ -1046,6 +1300,133 @@ pub fn hide(app: &AppHandle, label: &str) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn picture(width: u32, height: u32, color: impl Fn(u32, u32) -> [u8; 3]) -> RgbaImage {
+        RgbaImage::from_fn(width, height, |x, y| {
+            let [r, g, b] = color(x, y);
+            image::Rgba([r, g, b, 255])
+        })
+    }
+
+    #[test]
+    fn a_flat_background_becomes_transparent() {
+        let inside = |x: u32, y: u32| (6..14).contains(&x) && (6..14).contains(&y);
+        let img = picture(20, 20, |x, y| if inside(x, y) { [200, 30, 30] } else { [250, 250, 250] });
+        let cleared = clear_flat_background(img);
+        assert_eq!(cleared.get_pixel(0, 0).0[3], 0);
+        assert_eq!(cleared.get_pixel(5, 5).0[3], 0);
+        assert_eq!(cleared.get_pixel(10, 10).0[3], 255);
+    }
+
+    #[test]
+    fn a_blurry_white_edge_leaves_no_white_fringe() {
+        let img = picture(40, 40, |x, y| {
+            let edge = [x.abs_diff(20), y.abs_diff(20)].into_iter().max().unwrap();
+            match edge {
+                0..=10 => [20, 20, 20],
+                11 => [200, 200, 200],
+                12 => [232, 232, 232],
+                _ => [255, 255, 255],
+            }
+        });
+        let cleared = clear_flat_background(img);
+        assert!(cleared.get_pixel(20, 8).0[3] < 100, "{:?}", cleared.get_pixel(20, 8));
+        assert_eq!(cleared.get_pixel(20, 20).0[3], 255);
+
+        let larger = image::imageops::resize(&cleared, 80, 80, FilterType::CatmullRom);
+        let fringe = larger
+            .pixels()
+            .filter(|p| p.0[3] > 128 && p.0[..3].iter().all(|c| *c > 180))
+            .count();
+        assert_eq!(fringe, 0);
+    }
+
+    #[test]
+    fn transparent_pixels_take_the_character_color_near_it() {
+        let img = picture(20, 20, |x, y| {
+            if (6..14).contains(&x) && (6..14).contains(&y) {
+                [20, 20, 200]
+            } else {
+                [255, 255, 255]
+            }
+        });
+        let cleared = clear_flat_background(img);
+        let beside = cleared.get_pixel(10, 5).0;
+        assert_eq!(beside[3], 0);
+        assert!(beside[0] < 100, "{beside:?}");
+    }
+
+    #[test]
+    fn white_clothes_survive_a_small_gap_in_their_outline() {
+        let outline = |x: u32, y: u32| {
+            let square = (10..30).contains(&x) && (10..30).contains(&y);
+            let inside = (12..28).contains(&x) && (12..28).contains(&y);
+            let gap = (19..21).contains(&x) && y < 12;
+            square && !inside && !gap
+        };
+        let img = picture(40, 40, |x, y| if outline(x, y) { [15, 15, 15] } else { [255, 255, 255] });
+        let cleared = clear_flat_background(img);
+        assert_eq!(cleared.get_pixel(0, 0).0[3], 0);
+        assert_eq!(cleared.get_pixel(20, 20).0[3], 255);
+        assert_eq!(cleared.get_pixel(14, 14).0[3], 255);
+    }
+
+    #[test]
+    fn small_gaps_between_strands_clear_but_closed_eyes_stay() {
+        let img = picture(100, 100, |x, y| {
+            let body = (20..80).contains(&x) && (20..80).contains(&y);
+            let eye = (30..36).contains(&x) && (30..36).contains(&y);
+            let sliver = (50..53).contains(&x) && (20..35).contains(&y);
+            if body && !eye && !sliver {
+                [15, 15, 15]
+            } else {
+                [255, 255, 255]
+            }
+        });
+        let cleared = clear_flat_background(img);
+        assert_eq!(cleared.get_pixel(51, 30).0[3], 0);
+        assert_eq!(cleared.get_pixel(33, 33).0[3], 255);
+    }
+
+    #[test]
+    fn white_socks_cut_by_the_bottom_edge_stay() {
+        let leg = |x: u32, y: u32| (15..25).contains(&x) && y >= 20;
+        let inside = |x: u32, y: u32| (17..23).contains(&x) && y >= 22;
+        let img = picture(40, 40, |x, y| {
+            if leg(x, y) && !inside(x, y) {
+                [15, 15, 15]
+            } else {
+                [255, 255, 255]
+            }
+        });
+        let cleared = clear_flat_background(img);
+        assert_eq!(cleared.get_pixel(0, 39).0[3], 0);
+        assert_eq!(cleared.get_pixel(20, 39).0[3], 255);
+        assert_eq!(cleared.get_pixel(20, 30).0[3], 255);
+    }
+
+    #[test]
+    fn white_inside_the_character_stays() {
+        let ring = |x: u32, y: u32| (5..15).contains(&x) && (5..15).contains(&y) && !((8..12).contains(&x) && (8..12).contains(&y));
+        let img = picture(20, 20, |x, y| if ring(x, y) { [20, 20, 20] } else { [255, 255, 255] });
+        let cleared = clear_flat_background(img);
+        assert_eq!(cleared.get_pixel(0, 0).0[3], 0);
+        assert_eq!(cleared.get_pixel(10, 10).0[3], 255);
+    }
+
+    #[test]
+    fn a_busy_background_is_left_alone() {
+        let img = picture(20, 20, |x, y| [(x * 12) as u8, (y * 12) as u8, ((x + y) * 6) as u8]);
+        let cleared = clear_flat_background(img);
+        assert!(cleared.pixels().all(|p| p.0[3] == 255));
+    }
+
+    #[test]
+    fn a_nearly_blank_picture_is_left_alone() {
+        let img = picture(20, 20, |_, _| [255, 255, 255]);
+        let cleared = clear_flat_background(img);
+        assert!(cleared.pixels().all(|p| p.0[3] == 255));
+    }
 
     #[test]
     fn voice_files_sort_like_people_count() {

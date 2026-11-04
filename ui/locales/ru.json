@@ -118,6 +118,18 @@
     }
   },
   "ui": {
+    "{name} is now a mascot, with the basic cutout": "{name} теперь маскот, с простой обрезкой",
+    "The AI model needs the Microsoft Visual C++ Redistributable. Install it, then try again. For now, the basic cutout is used.": "Для модели ИИ нужен Microsoft Visual C++ Redistributable. Установите его и повторите попытку. Пока используется простая обрезка.",
+    "Cleaner mascots with AI": "Более чистые маскоты с ИИ",
+    "An AI model cuts the character out much more cleanly. It runs on your PC and your pictures stay there. It downloads once: about 250 MB, then 185 MB on your disk.": "Модель ИИ вырезает персонажа намного чище. Она работает на вашем ПК, и изображения остаются на нём. Загружается один раз: около 250 МБ, затем 185 МБ на диске.",
+    "Not now": "Не сейчас",
+    "Download": "Скачать",
+    "Downloading the AI model…": "Загрузка модели ИИ…",
+    "Downloading the AI model… {done} / {total} MB": "Загрузка модели ИИ… {done} / {total} МБ",
+    "Couldn't download the AI model. Using the basic cutout.": "Не удалось скачать модель ИИ. Используется простая обрезка.",
+    "AI model for cutouts (185 MB)": "Модель ИИ для обрезки (185 МБ)",
+    "Add as mascot": "Сделать маскотом",
+    "{name} is now a mascot": "{name} теперь маскот",
     "VNDB limited the number of requests, so this list may be incomplete. Try Refresh in a few minutes.": "VNDB ограничил число запросов, поэтому список может быть неполным. Нажмите «Обновить» через несколько минут.",
     "Combined": "Вместе",
     "Tags": "Теги",

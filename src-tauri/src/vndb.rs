@@ -286,7 +286,7 @@ impl Vndb {
 
         let body = json!({
             "filters": ["vn", "=", ["id", "=", id]],
-            "fields": "id,name,original,description,image.url,image.sexual,blood_type,height,weight,bust,waist,hips,age,birthday,sex,vns.id,vns.role,vns.spoiler",
+            "fields": "id,name,original,description,image.url,image.sexual,image.violence,blood_type,height,weight,bust,waist,hips,age,birthday,sex,vns.id,vns.role,vns.spoiler",
             "results": 100,
             "sort": "name",
         });

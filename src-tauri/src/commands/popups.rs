@@ -3,6 +3,7 @@ use std::path::Path;
 use tauri::{AppHandle, WebviewWindow};
 
 use super::SharedState;
+use crate::cutout;
 use crate::mascot::{self, GalleryItem, MascotInfo};
 use crate::ui_windows::{self, Toast};
 
@@ -42,6 +43,44 @@ pub fn add_mascot(app: AppHandle, shared: SharedState, path: String) -> Result<(
     mascot::set_shown(&shared, &id, true);
     mascot::refresh(&app);
     Ok(())
+}
+
+#[tauri::command]
+pub async fn add_character_mascot(
+    app: AppHandle,
+    shared: SharedState<'_>,
+    name: String,
+    url: String,
+) -> Result<bool, String> {
+    let shared = std::sync::Arc::clone(&shared);
+    super::blocking(move || {
+        let (id, ai_failed) = mascot::add_character(&shared, &name, &url)?;
+        mascot::set_shown(&shared, &id, true);
+        mascot::refresh(&app);
+        Ok(ai_failed)
+    })
+    .await
+}
+
+#[tauri::command]
+pub fn cutout_ready(shared: SharedState) -> bool {
+    cutout::ready(&shared)
+}
+
+#[tauri::command]
+pub async fn download_cutout(shared: SharedState<'_>) -> Result<bool, String> {
+    let shared = std::sync::Arc::clone(&shared);
+    super::blocking(move || cutout::download(&shared)).await
+}
+
+#[tauri::command]
+pub fn cancel_cutout_download() {
+    cutout::cancel();
+}
+
+#[tauri::command(async)]
+pub fn remove_cutout(shared: SharedState) -> Result<(), String> {
+    cutout::remove(&shared)
 }
 
 #[tauri::command(async)]

@@ -118,6 +118,18 @@
     }
   },
   "ui": {
+    "{name} is now a mascot, with the basic cutout": "{name} giờ là linh vật, với cách tách cơ bản",
+    "The AI model needs the Microsoft Visual C++ Redistributable. Install it, then try again. For now, the basic cutout is used.": "Mô hình AI cần Microsoft Visual C++ Redistributable. Hãy cài đặt rồi thử lại. Hiện tại sẽ dùng cách tách cơ bản.",
+    "Cleaner mascots with AI": "Linh vật sạch hơn với AI",
+    "An AI model cuts the character out much more cleanly. It runs on your PC and your pictures stay there. It downloads once: about 250 MB, then 185 MB on your disk.": "Mô hình AI tách nhân vật sạch hơn nhiều. Nó chạy trên máy của bạn và ảnh vẫn ở trên máy. Chỉ tải một lần: khoảng 250 MB, sau đó chiếm 185 MB trên ổ đĩa.",
+    "Not now": "Để sau",
+    "Download": "Tải xuống",
+    "Downloading the AI model…": "Đang tải mô hình AI…",
+    "Downloading the AI model… {done} / {total} MB": "Đang tải mô hình AI… {done} / {total} MB",
+    "Couldn't download the AI model. Using the basic cutout.": "Không tải được mô hình AI. Đang dùng cách tách cơ bản.",
+    "AI model for cutouts (185 MB)": "Mô hình AI để tách nền (185 MB)",
+    "Add as mascot": "Thêm làm linh vật",
+    "{name} is now a mascot": "{name} giờ là linh vật",
     "VNDB limited the number of requests, so this list may be incomplete. Try Refresh in a few minutes.": "VNDB đã giới hạn số yêu cầu nên danh sách này có thể chưa đầy đủ. Hãy thử Làm mới sau vài phút.",
     "Combined": "Tổng hợp",
     "Tags": "Thẻ",

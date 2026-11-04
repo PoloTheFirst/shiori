@@ -138,11 +138,24 @@ async function load() {
     toggle("Show on desktop", store.settings.mascot_enabled, (on) => save({ mascot_enabled: on })),
   );
   part("options").replaceChildren(...options());
-  const [items, personalities] = await Promise.all([
+  const [items, personalities, aiReady] = await Promise.all([
     call("list_mascots"),
     call("mascot_personalities"),
+    call("cutout_ready"),
   ]);
   part("grid").replaceChildren(...items.map((item) => card(item, personalities)));
+  if (aiReady) {
+    part("options").append(cutoutRow());
+  }
+}
+
+function cutoutRow() {
+  const remove = el("button", { class: "btn danger small" });
+  confirmButton(remove, "Remove", async () => {
+    await call("remove_cutout");
+    load();
+  });
+  return el("div", { class: "field" }, el("span", {}, "AI model for cutouts (185 MB)"), remove);
 }
 
 function card(item, personalities) {

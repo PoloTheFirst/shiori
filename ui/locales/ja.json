@@ -118,6 +118,18 @@
     }
   },
   "ui": {
+    "{name} is now a mascot, with the basic cutout": "{name}をマスコットにしました(簡易切り抜き)",
+    "The AI model needs the Microsoft Visual C++ Redistributable. Install it, then try again. For now, the basic cutout is used.": "AIモデルには Microsoft Visual C++ 再頒布可能パッケージが必要です。インストールしてからもう一度お試しください。今回は簡易切り抜きを使用します。",
+    "Cleaner mascots with AI": "AIでマスコットをきれいに",
+    "An AI model cuts the character out much more cleanly. It runs on your PC and your pictures stay there. It downloads once: about 250 MB, then 185 MB on your disk.": "AIモデルがキャラクターをよりきれいに切り抜きます。処理はお使いのPC上で行われ、画像は外部に送信されません。ダウンロードは一度だけで、約250MB、ディスク使用量は185MBです。",
+    "Not now": "今はしない",
+    "Download": "ダウンロード",
+    "Downloading the AI model…": "AIモデルをダウンロード中…",
+    "Downloading the AI model… {done} / {total} MB": "AIモデルをダウンロード中… {done} / {total} MB",
+    "Couldn't download the AI model. Using the basic cutout.": "AIモデルをダウンロードできませんでした。簡易切り抜きを使用します。",
+    "AI model for cutouts (185 MB)": "切り抜き用AIモデル (185 MB)",
+    "Add as mascot": "マスコットに追加",
+    "{name} is now a mascot": "{name}をマスコットにしました",
     "VNDB limited the number of requests, so this list may be incomplete. Try Refresh in a few minutes.": "VNDBのリクエスト制限により、このリストは不完全な可能性があります。数分後に更新してください。",
     "Combined": "総合",
     "Tags": "タグ",

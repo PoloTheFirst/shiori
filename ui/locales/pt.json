@@ -118,6 +118,18 @@
     }
   },
   "ui": {
+    "{name} is now a mascot, with the basic cutout": "{name} agora é um mascote, com o recorte básico",
+    "The AI model needs the Microsoft Visual C++ Redistributable. Install it, then try again. For now, the basic cutout is used.": "O modelo de IA precisa do Microsoft Visual C++ Redistributable. Instale-o e tente de novo. Por enquanto, é usado o recorte básico.",
+    "Cleaner mascots with AI": "Mascotes mais limpos com IA",
+    "An AI model cuts the character out much more cleanly. It runs on your PC and your pictures stay there. It downloads once: about 250 MB, then 185 MB on your disk.": "Um modelo de IA recorta o personagem com muito mais limpeza. Ele roda no seu PC e suas imagens ficam nele. O download é feito uma só vez: cerca de 250 MB, depois 185 MB no disco.",
+    "Not now": "Agora não",
+    "Download": "Baixar",
+    "Downloading the AI model…": "Baixando o modelo de IA…",
+    "Downloading the AI model… {done} / {total} MB": "Baixando o modelo de IA… {done} / {total} MB",
+    "Couldn't download the AI model. Using the basic cutout.": "Não foi possível baixar o modelo de IA. Usando o recorte básico.",
+    "AI model for cutouts (185 MB)": "Modelo de IA para recortes (185 MB)",
+    "Add as mascot": "Adicionar como mascote",
+    "{name} is now a mascot": "{name} agora é um mascote",
     "VNDB limited the number of requests, so this list may be incomplete. Try Refresh in a few minutes.": "O VNDB limitou o número de solicitações, então esta lista pode estar incompleta. Tente Atualizar em alguns minutos.",
     "Combined": "Combinado",
     "Tags": "Tags",
