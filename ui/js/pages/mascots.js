@@ -1,8 +1,8 @@
 import { $, el, html } from "../dom.js";
-import { fileUrl, pickFile } from "../tauri.js";
+import { fileUrl, pickFile, pickSaveFile } from "../tauri.js";
 import { register } from "../router.js";
 import { store, subscribe } from "../store.js";
-import { call, confirmButton, openDialog, toggle } from "../ui.js";
+import { call, confirmButton, openDialog, toast, toggle } from "../ui.js";
 import { t } from "../i18n.js";
 import { hotkeyInput } from "../components/hotkey-input.js";
 
@@ -51,7 +51,11 @@ const VOICE_MOMENTS = [
 
 const CHATTER_MINUTES = [0, 1, 3, 5, 10, 15, 30];
 
-const IMAGE_FILTERS = [{ name: "Images", extensions: ["png", "webp", "gif"] }];
+const PACK_EXTENSION = "shiorimascot";
+const MASCOT_FILTERS = [
+  { name: "Images or shared mascots", extensions: ["png", "webp", "gif", PACK_EXTENSION] },
+];
+const PACK_FILTERS = [{ name: "Shared mascot", extensions: [PACK_EXTENSION] }];
 const AUDIO_FILTERS = [
   { name: "Audio", extensions: ["mp3", "wav", "ogg", "m4a", "opus", "flac"] },
 ];
@@ -226,6 +230,12 @@ function card(item, personalities) {
     editVoices(item);
   };
 
+  const share = el("button", { class: "btn secondary small" }, "Share…");
+  share.onclick = (event) => {
+    event.stopPropagation();
+    shareMascot(item);
+  };
+
   return el(
     "div",
     {
@@ -255,7 +265,7 @@ function card(item, personalities) {
         voices,
       ),
       el("div", { class: "mascot-size" }, viewOnly),
-      remove,
+      el("div", { class: "row" }, share, remove),
     ),
   );
 }
@@ -391,8 +401,21 @@ async function editVoices(item) {
   preview?.pause();
 }
 
+async function shareMascot(item) {
+  const name = t(item.name);
+  const path = await pickSaveFile({
+    title: "Share this mascot",
+    defaultPath: `${name}.${PACK_EXTENSION}`,
+    filters: PACK_FILTERS,
+  });
+  if (path) {
+    await call("export_mascot", { id: item.id, path });
+    toast(t("Saved. Send this file so others can add {name}.", { name }));
+  }
+}
+
 async function addMascot() {
-  const path = await pickFile({ title: "Choose a mascot image", filters: IMAGE_FILTERS });
+  const path = await pickFile({ title: "Choose a mascot image", filters: MASCOT_FILTERS });
   if (path) {
     await call("add_mascot", { path });
   }

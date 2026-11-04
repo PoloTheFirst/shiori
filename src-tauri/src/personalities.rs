@@ -85,6 +85,10 @@ pub fn custom(mut base: Lines, own: &Value) -> Lines {
     base
 }
 
+pub fn exists(id: &str) -> bool {
+    id == CUSTOM || lang::data("en")["personalities"].get(id).is_some()
+}
+
 #[derive(Serialize)]
 pub struct Choice {
     id: &'static str,

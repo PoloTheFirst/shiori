@@ -118,6 +118,14 @@
     }
   },
   "ui": {
+    "Share…": "Поделиться…",
+    "Images or shared mascots": "Изображения или общие маскоты",
+    "Shared mascot": "Общий маскот",
+    "Share this mascot": "Поделиться этим маскотом",
+    "Saved. Send this file so others can add {name}.": "Сохранено. Отправьте этот файл, чтобы другие могли добавить {name}.",
+    "That file isn't a Shiori mascot.": "Этот файл не является маскотом Shiori.",
+    "That mascot was made with a newer Shiori RPC. Update the app first.": "Этот маскот создан в более новой версии Shiori RPC. Сначала обновите приложение.",
+    "That mascot file is too big.": "Файл маскота слишком большой.",
     "{name} is now a mascot, with the basic cutout": "{name} теперь маскот, с простой обрезкой",
     "The AI model needs the Microsoft Visual C++ Redistributable. Install it, then try again. For now, the basic cutout is used.": "Для модели ИИ нужен Microsoft Visual C++ Redistributable. Установите его и повторите попытку. Пока используется простая обрезка.",
     "Cleaner mascots with AI": "Более чистые маскоты с ИИ",

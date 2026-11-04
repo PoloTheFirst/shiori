@@ -118,6 +118,14 @@
     }
   },
   "ui": {
+    "Share…": "分享…",
+    "Images or shared mascots": "圖片或分享的吉祥物",
+    "Shared mascot": "分享的吉祥物",
+    "Share this mascot": "分享這個吉祥物",
+    "Saved. Send this file so others can add {name}.": "已儲存。把這個檔案傳給別人,他們就能新增{name}。",
+    "That file isn't a Shiori mascot.": "這個檔案不是 Shiori 吉祥物。",
+    "That mascot was made with a newer Shiori RPC. Update the app first.": "這個吉祥物是用較新版本的 Shiori RPC 製作的,請先更新應用程式。",
+    "That mascot file is too big.": "吉祥物檔案太大了。",
     "{name} is now a mascot, with the basic cutout": "{name} 現在是吉祥物了,使用基本去背",
     "The AI model needs the Microsoft Visual C++ Redistributable. Install it, then try again. For now, the basic cutout is used.": "AI 模型需要 Microsoft Visual C++ Redistributable。請安裝後再試一次。目前先使用基本去背。",
     "Cleaner mascots with AI": "用 AI 讓吉祥物更乾淨",

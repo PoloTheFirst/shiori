@@ -5,6 +5,7 @@ use tauri::{AppHandle, WebviewWindow};
 use super::SharedState;
 use crate::cutout;
 use crate::mascot::{self, GalleryItem, MascotInfo};
+use crate::mascot_pack;
 use crate::ui_windows::{self, Toast};
 
 #[tauri::command(async)]
@@ -39,10 +40,20 @@ pub fn list_mascots(shared: SharedState) -> Vec<GalleryItem> {
 
 #[tauri::command(async)]
 pub fn add_mascot(app: AppHandle, shared: SharedState, path: String) -> Result<(), String> {
-    let id = mascot::add_to_gallery(&shared, Path::new(&path))?;
+    let path = Path::new(&path);
+    let id = if mascot_pack::is_pack(path) {
+        mascot_pack::import(&shared, path)?
+    } else {
+        mascot::add_to_gallery(&shared, path)?
+    };
     mascot::set_shown(&shared, &id, true);
     mascot::refresh(&app);
     Ok(())
+}
+
+#[tauri::command(async)]
+pub fn export_mascot(shared: SharedState, id: String, path: String) -> Result<(), String> {
+    mascot_pack::export(&shared, &id, Path::new(&path))
 }
 
 #[tauri::command]

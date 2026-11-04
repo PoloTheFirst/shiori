@@ -60,7 +60,7 @@
     <td width="50%" valign="top">
       <img src="image/mascot.png" width="100%" alt="A desktop mascot over a game">
       <h3>Desktop mascots</h3>
-      Characters on your desktop who talk about what you read, with personalities, your own lines and voices.
+      Characters on your desktop who talk about what you read, with personalities, your own lines and voices. Share them as a file, or turn any VNDB character into one.
     </td>
   </tr>
 </table>
@@ -168,7 +168,7 @@ The engine is in Rust (`src-tauri/src`). The interface is plain HTML, CSS and Ja
 | `config.rs`, `vndb.rs`, `vndb_list.rs`, `steam.rs` | Library files, VNDB search, covers, characters, list and wishlist |
 | `discord.rs`, `presence.rs` | Rich Presence over Discord's IPC pipe, your own status layout |
 | `screenshots.rs`, `capture.rs`, `hotkey.rs`, `sound.rs` | capture key, window capture, shutter sound |
-| `mascot.rs`, `personalities.rs`, `ui_windows.rs`, `tray.rs` | desktop mascots, speech balloon, toast, main window, tray |
+| `mascot.rs`, `mascot_pack.rs`, `cutout.rs`, `personalities.rs`, `ui_windows.rs`, `tray.rs` | desktop mascots, shared mascot files, AI cutouts, speech balloon, toast, main window, tray |
 | `launcher.rs`, `backup.rs`, `updater.rs`, `autostart.rs` | Play (Steam, Locale Emulator, NTLEA), export and import, updates, startup |
 | `lang.rs`, `crash.rs` | languages, crash reports |
 | `images.rs`, `clipboard.rs`, `shell.rs`, `winapi.rs` | thumbnails, clipboard, shortcuts, Explorer, Win32 |

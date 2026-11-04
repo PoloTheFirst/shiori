@@ -118,6 +118,14 @@
     }
   },
   "ui": {
+    "Share…": "Compartilhar…",
+    "Images or shared mascots": "Imagens ou mascotes compartilhados",
+    "Shared mascot": "Mascote compartilhado",
+    "Share this mascot": "Compartilhar este mascote",
+    "Saved. Send this file so others can add {name}.": "Salvo. Envie este arquivo para que outros possam adicionar {name}.",
+    "That file isn't a Shiori mascot.": "Esse arquivo não é um mascote do Shiori.",
+    "That mascot was made with a newer Shiori RPC. Update the app first.": "Esse mascote foi feito com uma versão mais nova do Shiori RPC. Atualize o app primeiro.",
+    "That mascot file is too big.": "Esse arquivo de mascote é grande demais.",
     "{name} is now a mascot, with the basic cutout": "{name} agora é um mascote, com o recorte básico",
     "The AI model needs the Microsoft Visual C++ Redistributable. Install it, then try again. For now, the basic cutout is used.": "O modelo de IA precisa do Microsoft Visual C++ Redistributable. Instale-o e tente de novo. Por enquanto, é usado o recorte básico.",
     "Cleaner mascots with AI": "Mascotes mais limpos com IA",

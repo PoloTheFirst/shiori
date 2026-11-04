@@ -118,6 +118,14 @@
     }
   },
   "ui": {
+    "Share…": "Chia sẻ…",
+    "Images or shared mascots": "Ảnh hoặc linh vật được chia sẻ",
+    "Shared mascot": "Linh vật được chia sẻ",
+    "Share this mascot": "Chia sẻ linh vật này",
+    "Saved. Send this file so others can add {name}.": "Đã lưu. Gửi tệp này để người khác có thể thêm {name}.",
+    "That file isn't a Shiori mascot.": "Tệp này không phải linh vật Shiori.",
+    "That mascot was made with a newer Shiori RPC. Update the app first.": "Linh vật này được tạo bằng phiên bản Shiori RPC mới hơn. Hãy cập nhật ứng dụng trước.",
+    "That mascot file is too big.": "Tệp linh vật quá lớn.",
     "{name} is now a mascot, with the basic cutout": "{name} giờ là linh vật, với cách tách cơ bản",
     "The AI model needs the Microsoft Visual C++ Redistributable. Install it, then try again. For now, the basic cutout is used.": "Mô hình AI cần Microsoft Visual C++ Redistributable. Hãy cài đặt rồi thử lại. Hiện tại sẽ dùng cách tách cơ bản.",
     "Cleaner mascots with AI": "Linh vật sạch hơn với AI",

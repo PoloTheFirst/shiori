@@ -28,6 +28,7 @@ mod crash;
 mod cutout;
 mod lang;
 mod mascot;
+mod mascot_pack;
 mod personalities;
 mod reco;
 mod screenshots;
@@ -261,6 +262,7 @@ fn main() {
             commands::popups::list_mascots,
             commands::popups::add_mascot,
             commands::popups::add_character_mascot,
+            commands::popups::export_mascot,
             commands::popups::cutout_ready,
             commands::popups::download_cutout,
             commands::popups::cancel_cutout_download,

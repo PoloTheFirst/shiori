@@ -21,10 +21,10 @@ use crate::state::{Shared, Snapshot};
 use crate::ui_windows::{self, Toast};
 use crate::winapi;
 
-const BUILT_IN: &[u8] = include_bytes!("../assets/mascot.png");
-const BUILT_IN_ID: &str = "default";
-const IMAGE_EXTS: [&str; 3] = ["png", "webp", "gif"];
-const AUDIO_EXTS: [&str; 6] = ["mp3", "wav", "ogg", "m4a", "opus", "flac"];
+pub(crate) const BUILT_IN: &[u8] = include_bytes!("../assets/mascot.png");
+pub(crate) const BUILT_IN_ID: &str = "default";
+pub(crate) const IMAGE_EXTS: [&str; 3] = ["png", "webp", "gif"];
+pub(crate) const AUDIO_EXTS: [&str; 6] = ["mp3", "wav", "ogg", "m4a", "opus", "flac"];
 pub const VOICE_EVENTS: [&str; 8] =
     ["start", "stop", "idle", "back", "section", "screenshot", "poke", "chatter"];
 
@@ -98,7 +98,7 @@ fn gallery_files(shared: &Shared) -> Vec<PathBuf> {
     files
 }
 
-fn file_for(shared: &Shared, id: &str) -> Option<PathBuf> {
+pub(crate) fn file_for(shared: &Shared, id: &str) -> Option<PathBuf> {
     gallery_files(shared)
         .into_iter()
         .find(|path| path.file_stem().is_some_and(|stem| stem.to_string_lossy() == id))
@@ -155,7 +155,7 @@ fn save_settings(shared: &Shared, changes: Map<String, Value>) {
     let _ = shared.config.lock().unwrap().update(changes);
 }
 
-fn height_for(shared: &Shared, id: &str) -> u32 {
+pub(crate) fn height_for(shared: &Shared, id: &str) -> u32 {
     let cfg = shared.config.lock().unwrap();
     let default = match cfg.num("mascot_height") as u32 {
         0 => 420,
@@ -873,7 +873,7 @@ pub fn speaker() -> Option<String> {
     SPEAKER.lock().unwrap().clone()
 }
 
-fn personality_of(shared: &Shared, id: &str) -> String {
+pub(crate) fn personality_of(shared: &Shared, id: &str) -> String {
     shared
         .config
         .lock()
@@ -898,7 +898,7 @@ pub fn set_personality(shared: &Shared, id: &str, personality: &str) {
     save_settings(shared, Map::from_iter([("mascot_personalities".into(), Value::Object(all))]));
 }
 
-fn custom_lines_of(shared: &Shared, id: &str) -> Value {
+pub(crate) fn custom_lines_of(shared: &Shared, id: &str) -> Value {
     shared
         .config
         .lock()
@@ -1063,7 +1063,7 @@ pub fn start_chatter(app: &AppHandle) {
     });
 }
 
-fn view_only_of(shared: &Shared, id: &str) -> bool {
+pub(crate) fn view_only_of(shared: &Shared, id: &str) -> bool {
     shared
         .config
         .lock()
