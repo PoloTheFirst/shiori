@@ -420,17 +420,23 @@ impl Engine {
     }
 
     fn handle_target(&mut self, target: Target) {
-        let (key, emulated) = {
+        let (key, emulated, no_game) = {
             let cfg = self.shared.config.lock().unwrap();
             let split = cfg.str("detection_mode") == "manual" && cfg.bool("split_by_title");
             let emulated = emulators::game_in_window(&target.exe, &target.title, split);
+            let bare_emulator = emulated.is_none() && emulators::emulator_name(&target.exe).is_some();
             let key = match &emulated {
                 Some(game) => format!("{}@{}", game_key(&target.exe), game.id),
-                None if emulators::emulator_name(&target.exe).is_some() => game_key(&target.exe),
+                None if bare_emulator => game_key(&target.exe),
                 None => cfg.key_for(&target.exe, &target.exe_path),
             };
-            (key, emulated)
+            let no_game = bare_emulator && text(&cfg.game(&key), "vndb_id").is_empty();
+            (key, emulated, no_game)
         };
+        if no_game {
+            self.handle_closed();
+            return;
+        }
         if key != self.current_key {
             self.start_session(&key);
         }

@@ -156,6 +156,15 @@ mod tests {
     }
 
     #[test]
+    fn an_emulator_without_a_game_is_not_a_game() {
+        let exe = "DeSmuME_0.9.13_x64.exe";
+        assert!(emulator_name(exe).is_some());
+        assert!(game(exe, "DeSmuME 0.9.13 x64 SSE2").is_none());
+        let found = game(exe, "DeSmuME 0.9.13 x64 SSE2 | Tokimeki Memorial Girl's Side").unwrap();
+        assert_eq!(found.1, "Tokimeki Memorial Girl's Side");
+    }
+
+    #[test]
     fn splits_any_program_by_title_when_asked() {
         let split = game_in_window("myemu.exe", "MyEmu 2.0 | Little Busters!", true).unwrap();
         assert_eq!(split.name, "Little Busters!");
