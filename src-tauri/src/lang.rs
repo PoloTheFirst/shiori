@@ -100,4 +100,16 @@ mod tests {
         assert_eq!(resolve("fr"), "fr");
         assert_eq!(tr("Reading", "en"), "Reading");
     }
+
+    #[test]
+    fn english_has_every_string_to_translate() {
+        let english = data("en");
+        for (code, _) in FILES {
+            for section in ["app", "ui"] {
+                for key in data(code)[section].as_object().unwrap().keys() {
+                    assert!(english[section][key].is_string(), "en.json {section} is missing {key:?} (from {code})");
+                }
+            }
+        }
+    }
 }

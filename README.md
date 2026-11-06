@@ -127,7 +127,7 @@ Everything is in `%APPDATA%\moe.lenn.shiori\`: `config.yaml` (settings), `games\
 
 ## Translate it
 
-Each language lives in a single file, `ui/locales/<code>.json`: the interface, the Discord status and the mascot lines. Want to add yours? Copy `en.json`, translate it, and say hi on the [Discord](https://discord.gg/cDTUQFq4Hn).
+Each language lives in a single file, `ui/locales/<code>.json`: the interface, the Discord status and the mascot lines. Want to add yours? Copy `en.json`, translate the text on the right of each `"key": "text"` line (leave the keys and the `{…}` parts as they are), and say hi on the [Discord](https://discord.gg/cDTUQFq4Hn).
 
 <details>
 <summary><b>For developers</b></summary>
