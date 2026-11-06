@@ -2,6 +2,8 @@
   "name": "日本語",
   "flag": "JP",
   "app": {
+    "{h}h {mm}m": "{h}時間{m}分",
+    "Today: {}": "今日：{}",
     "Show": "表示",
     "Pause / resume presence": "ステータスを一時停止 / 再開",
     "Take screenshot": "スクリーンショットを撮る",
@@ -118,6 +120,8 @@
     }
   },
   "ui": {
+    "“Total read: …”": "「合計読書時間：…」",
+    "“Today: …”": "「今日：…」",
     "Share your mascots": "マスコットを共有しよう",
     "Press “Share…” on a mascot to save it as a file, then post it on the Discord. You'll find other people's mascots there too.": "マスコットの「共有…」を押してファイルに保存し、Discord に投稿しよう。ほかの人のマスコットも見つかります。",
     "Share on Discord": "Discord で共有",

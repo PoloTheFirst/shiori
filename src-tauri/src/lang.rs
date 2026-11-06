@@ -63,6 +63,10 @@ pub struct Language {
     flag: &'static str,
 }
 
+pub fn codes() -> impl Iterator<Item = &'static str> {
+    FILES.iter().map(|(code, _)| *code)
+}
+
 pub fn list() -> Vec<Language> {
     FILES
         .iter()
@@ -88,7 +92,7 @@ mod tests {
             assert!(data["name"].is_string() && data["flag"].is_string(), "{code}: name/flag");
             assert!(data["ui"].is_object() && data["app"].is_object(), "{code}: ui/app");
             if code != "en" {
-                for key in ["Reading", "Total read: {}", "View on VNDB", "Hide this mascot"] {
+                for key in ["Reading", "Total read: {}", "Today: {}", "{h}h {mm}m", "View on VNDB", "Hide this mascot"] {
                     assert!(data["app"][key].is_string(), "{code}: app {key}");
                 }
             }

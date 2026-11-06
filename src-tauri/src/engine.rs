@@ -271,9 +271,12 @@ fn text(entry: &Map<String, Value>, field: &str) -> String {
         .to_string()
 }
 
-pub fn format_playtime(seconds: i64) -> String {
+pub fn format_playtime(seconds: i64, language: &str) -> String {
     let minutes = seconds.max(0) / 60;
-    format!("{}h {:02}m", minutes / 60, minutes % 60)
+    lang::tr("{h}h {mm}m", language)
+        .replace("{h}", &(minutes / 60).to_string())
+        .replace("{mm}", &format!("{:02}", minutes % 60))
+        .replace("{m}", &(minutes % 60).to_string())
 }
 
 fn now_f() -> f64 {
@@ -739,7 +742,7 @@ impl Engine {
             .filter(|_| cfg.bool("show_progress"));
         let state = if cfg.bool("show_total_read") && snap.playtime_seconds > 0 {
             let total = lang::tr("Total read: {}", language)
-                .replace("{}", &format_playtime(snap.playtime_seconds));
+                .replace("{}", &format_playtime(snap.playtime_seconds, language));
             match progress {
                 Some(percent) => format!("{total} · {percent}%"),
                 None => total,

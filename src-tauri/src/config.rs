@@ -358,6 +358,9 @@ impl Config {
                 }
             }
         }
+        if let Some(custom) = data.get_mut("presence_custom") {
+            crate::presence::upgrade_templates(custom);
+        }
         let mut games = BTreeMap::new();
         let mut filenames = HashMap::new();
         let mut paths: Vec<_> = fs::read_dir(dir.join("games"))

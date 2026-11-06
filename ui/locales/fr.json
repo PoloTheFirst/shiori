@@ -2,6 +2,8 @@
   "name": "Français",
   "flag": "FR",
   "app": {
+    "{h}h {mm}m": "{h} h {mm} min",
+    "Today: {}": "Aujourd'hui : {}",
     "Show": "Afficher",
     "Pause / resume presence": "Mettre en pause / reprendre",
     "Take screenshot": "Prendre une capture",
@@ -118,6 +120,8 @@
     }
   },
   "ui": {
+    "“Total read: …”": "« Temps de lecture : … »",
+    "“Today: …”": "« Aujourd'hui : … »",
     "Share your mascots": "Partage tes mascottes",
     "Press “Share…” on a mascot to save it as a file, then post it on the Discord. You'll find other people's mascots there too.": "Appuie sur « Partager… » sur une mascotte pour l'enregistrer en fichier, puis poste-la sur le Discord. Tu y trouveras aussi les mascottes des autres.",
     "Share on Discord": "Partager sur Discord",

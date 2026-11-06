@@ -33,6 +33,41 @@ fn capitalize(word: &str) -> String {
         .unwrap_or_default()
 }
 
+fn time_line(key: &'static str, time: &str, language: &str) -> String {
+    if time.is_empty() {
+        return String::new();
+    }
+    lang::tr(key, language).replace("{}", time)
+}
+
+const BAKED_LINES: [(&str, &str, &str); 2] = [
+    ("Total read: {time}", "{total}", "{total_read}"),
+    ("Today: {time}", "{today}", "{today_read}"),
+];
+
+pub fn upgrade_templates(custom: &mut Value) {
+    let Some(fields) = custom.as_object_mut() else {
+        return;
+    };
+    let baked: Vec<(String, &str)> = lang::codes()
+        .flat_map(|code| {
+            BAKED_LINES.into_iter().map(move |(key, var, line)| {
+                let text = lang::data(code)["ui"][key].as_str().unwrap_or(key);
+                (text.replace("{time}", var), line)
+            })
+        })
+        .collect();
+    for value in fields.values_mut() {
+        if let Value::String(text) = value {
+            for (old, line) in &baked {
+                if text.contains(old.as_str()) {
+                    *text = text.replace(old.as_str(), line);
+                }
+            }
+        }
+    }
+}
+
 pub fn vars(snap: &Snapshot, entry: &Map<String, Value>, original_first: bool, language: &str) -> Vars {
     let romanized = [&snap.game_name, &snap.raw_title]
         .into_iter()
@@ -60,6 +95,8 @@ pub fn vars(snap: &Snapshot, entry: &Map<String, Value>, original_first: bool, l
         .and_then(|d| d.get(crate::config::today()))
         .and_then(Value::as_i64)
         .unwrap_or(0);
+    let total = (snap.playtime_seconds > 0).then(|| format_playtime(snap.playtime_seconds, language)).unwrap_or_default();
+    let today = (today > 0).then(|| format_playtime(today, language)).unwrap_or_default();
 
     vec![
         ("title", title),
@@ -67,8 +104,10 @@ pub fn vars(snap: &Snapshot, entry: &Map<String, Value>, original_first: bool, l
         ("original", original),
         ("reading", lang::tr("Reading", language).to_string()),
         ("section", snap.section_label.clone()),
-        ("total", (snap.playtime_seconds > 0).then(|| format_playtime(snap.playtime_seconds)).unwrap_or_default()),
-        ("today", (today > 0).then(|| format_playtime(today)).unwrap_or_default()),
+        ("total_read", time_line("Total read: {}", &total, language)),
+        ("today_read", time_line("Today: {}", &today, language)),
+        ("total", total),
+        ("today", today),
         ("progress", progress),
         ("length", (length > 0).then(|| format!("~{}h", (length + 30) / 60)).unwrap_or_default()),
         ("status", capitalize(&text(entry, "status"))),
@@ -86,8 +125,10 @@ pub fn sample_vars(language: &str) -> Vars {
         ("original", "千恋＊万花".into()),
         ("reading", lang::tr("Reading", language).to_string()),
         ("section", "Murasame Route".into()),
-        ("total", "35h 11m".into()),
-        ("today", "1h 20m".into()),
+        ("total_read", time_line("Total read: {}", &format_playtime(35 * 3600 + 11 * 60, language), language)),
+        ("today_read", time_line("Today: {}", &format_playtime(80 * 60, language), language)),
+        ("total", format_playtime(35 * 3600 + 11 * 60, language)),
+        ("today", format_playtime(80 * 60, language)),
         ("progress", "78%".into()),
         ("length", "~45h".into()),
         ("status", "Playing".into()),
@@ -269,5 +310,16 @@ mod tests {
         assert_eq!(activity.small_text, "SiglusEngine");
         assert_eq!(activity.start, Some(6_400));
         assert_eq!(activity.buttons, vec![("VNDB".to_string(), "https://vndb.org/v19073".to_string())]);
+    }
+
+    #[test]
+    fn baked_time_lines_follow_the_presence_language() {
+        let mut custom = serde_json::json!({ "state": "合計読書時間: {total} · {progress}", "details": "Aujourd'hui : {today}" });
+        upgrade_templates(&mut custom);
+        assert_eq!(custom["state"], "{total_read} · {progress}");
+        assert_eq!(custom["details"], "{today_read}");
+        assert_eq!(fill("{total_read} · {progress}", &sample_vars("en")), "Total read: 35h 11m · 78%");
+        assert_eq!(fill("{today_read}", &sample_vars("fr")), "Aujourd'hui : 1 h 20 min");
+        assert_eq!(fill("{total}", &sample_vars("zh-TW")), "35小時11分");
     }
 }

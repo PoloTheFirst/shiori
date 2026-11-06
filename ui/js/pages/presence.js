@@ -12,6 +12,8 @@ const VARIABLES = [
   ["section", "Chapter or route"],
   ["total", "Total time read"],
   ["today", "Time read today"],
+  ["total_read", "“Total read: …”"],
+  ["today_read", "“Today: …”"],
   ["progress", "How far you are"],
   ["length", "Length on VNDB"],
   ["status", "Library status"],
@@ -25,7 +27,7 @@ const PRESETS = {
   default: {
     name: "{title}",
     details: "{reading}・{section}",
-    state: "{total} · {progress}",
+    state: "{total_read} · {progress}",
     large_text: "{romanized}",
     small_icon: "",
     small_text: "",
@@ -44,7 +46,7 @@ const PRESETS = {
   stats: {
     name: "{title}",
     details: "{total} · {progress}",
-    state: "Today: {today}",
+    state: "{today_read}",
     large_text: "{title} ({year}) · ★ {rating}",
     small_icon: "app",
     small_text: "{engine}",
@@ -171,9 +173,6 @@ function current() {
 
 function load() {
   custom = { ...PRESETS.default, ...(store.settings.presence_custom || {}) };
-  if (custom.state === PRESETS.default.state && !store.settings.presence_custom) {
-    custom.state = `${t("Total read: {time}", { time: "{total}" })} · {progress}`;
-  }
   const icon = custom.small_icon || "";
   iconMode = icon === "" || icon === "app" ? icon : "url";
 }
@@ -345,12 +344,6 @@ function build(container) {
       const preset = PRESETS[button.dataset.preset];
       custom = { ...custom, ...preset, buttons: custom.buttons };
       iconMode = custom.small_icon === "" || custom.small_icon === "app" ? custom.small_icon : "url";
-      if (button.dataset.preset === "default") {
-        custom.state = `${t("Total read: {time}", { time: "{total}" })} · {progress}`;
-      }
-      if (button.dataset.preset === "stats") {
-        custom.state = t("Today: {time}", { time: "{today}" });
-      }
       fillForm();
       changed();
     };
