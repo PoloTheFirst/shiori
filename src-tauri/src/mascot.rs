@@ -544,8 +544,8 @@ fn migrate_custom_image(shared: &Shared) {
     }
 }
 
-fn default_position(width: u32, height: u32, offset: &mut i32) -> (i32, i32) {
-    let (_, _, right, bottom) = winapi::work_area();
+fn default_position(width: u32, height: u32, near: (i32, i32), offset: &mut i32) -> (i32, i32) {
+    let (_, _, right, bottom) = winapi::work_area_at(near.0, near.1);
     let x = right - width as i32 - 40 - *offset;
     *offset += width as i32 + 20;
     (x, bottom - height as i32)
@@ -651,8 +651,9 @@ fn apply_now(app: &AppHandle) {
             let _ = window.set_always_on_top(topmost);
             let _ = window.set_always_on_bottom(!topmost);
             if positions.get(id).is_none() {
-                if let Ok(size) = window.outer_size() {
-                    let (x, y) = default_position(size.width, size.height, &mut offset);
+                if let (Ok(pos), Ok(size)) = (window.outer_position(), window.outer_size()) {
+                    let center = (pos.x + size.width as i32 / 2, pos.y + size.height as i32 / 2);
+                    let (x, y) = default_position(size.width, size.height, center, &mut offset);
                     let _ = window.set_position(PhysicalPosition::new(x, y));
                 }
             }
@@ -670,7 +671,10 @@ fn apply_now(app: &AppHandle) {
             continue;
         }
         let (x, y) = saved_position(positions.get(id), width, height)
-            .unwrap_or_else(|| default_position(width, height, &mut offset));
+            .unwrap_or_else(|| {
+                let near = winapi::cursor_pos().unwrap_or((0, 0));
+                default_position(width, height, near, &mut offset)
+            });
         let view_only = view_only_of(&shared, id);
         with_characters(|characters| {
             characters.insert(label.clone(), Character { file, alpha: character, view_only, token })

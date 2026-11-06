@@ -144,7 +144,8 @@ pub fn show_toast(app: &AppHandle, toast: Toast, area: Option<ScreenRect>) {
         let (x, y) = match area {
             Some(area) => (area.left + 16, area.top + 16),
             None => {
-                let (left, top, _, _) = winapi::work_area();
+                let (cx, cy) = winapi::cursor_pos().unwrap_or((0, 0));
+                let (left, top, _, _) = winapi::work_area_at(cx, cy);
                 (left + 16, top + 16)
             }
         };
@@ -210,7 +211,7 @@ pub fn place_balloon(app: &AppHandle, width: u32, height: u32) -> &'static str {
 
     let (bw, bh) = (width as i32, height as i32);
     let (cw, ch) = (size.width as i32, size.height as i32);
-    let (left, top, right, _) = winapi::work_area();
+    let (left, top, right, _) = winapi::work_area_at(pos.x + cw / 2, pos.y + ch / 2);
 
     let mut x = pos.x - bw + cw / 6;
     let before = x >= left;

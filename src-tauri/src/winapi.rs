@@ -3,6 +3,7 @@ use std::ffi::c_void;
 use windows::core::{BOOL, PWSTR};
 use windows::Win32::Foundation::{CloseHandle, HWND, LPARAM};
 use windows::Win32::Foundation::{POINT, RECT};
+use windows::Win32::Graphics::Gdi::{GetMonitorInfoW, MonitorFromPoint, MONITORINFO, MONITOR_DEFAULTTONEAREST};
 use windows::Win32::System::Threading::{
     OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_WIN32, PROCESS_QUERY_LIMITED_INFORMATION,
 };
@@ -168,6 +169,22 @@ pub fn work_area() -> (i32, i32, i32, i32) {
             SYSTEM_PARAMETERS_INFO_UPDATE_FLAGS(0),
         );
     }
+    (rect.left, rect.top, rect.right, rect.bottom)
+}
+
+pub fn work_area_at(x: i32, y: i32) -> (i32, i32, i32, i32) {
+    let mut info = MONITORINFO {
+        cbSize: std::mem::size_of::<MONITORINFO>() as u32,
+        ..Default::default()
+    };
+    let found = unsafe {
+        let monitor = MonitorFromPoint(POINT { x, y }, MONITOR_DEFAULTTONEAREST);
+        GetMonitorInfoW(monitor, &mut info).as_bool()
+    };
+    if !found {
+        return work_area();
+    }
+    let rect = info.rcWork;
     (rect.left, rect.top, rect.right, rect.bottom)
 }
 
