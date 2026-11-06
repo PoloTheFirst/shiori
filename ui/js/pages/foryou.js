@@ -462,9 +462,16 @@ function actions(vn) {
   );
 }
 
+const thumbnailOf = (url) => url.replace(/^(https:\/\/t\.vndb\.org\/cv)\//, "$1.t/");
+
 function coverOf(vn) {
   const cover = el("div", { class: "cover reco-cover" });
-  setCover(cover, { url: vn.image_url, nsfw: vn.nsfw, label: vn.title });
+  const full = { url: vn.image_url, nsfw: vn.nsfw, label: vn.title };
+  setCover(cover, { ...full, url: thumbnailOf(vn.image_url || "") });
+  const img = cover.querySelector("img");
+  if (img && img.src !== vn.image_url) {
+    img.onerror = () => setCover(cover, full);
+  }
   return cover;
 }
 
