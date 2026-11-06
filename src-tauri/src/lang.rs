@@ -4,7 +4,7 @@ use serde::Serialize;
 use serde_json::Value;
 use windows::Win32::Globalization::GetUserDefaultLocaleName;
 
-const FILES: [(&str, &str); 9] = [
+const FILES: [(&str, &str); 10] = [
     ("en", include_str!("../../ui/locales/en.json")),
     ("fr", include_str!("../../ui/locales/fr.json")),
     ("es", include_str!("../../ui/locales/es.json")),
@@ -14,6 +14,7 @@ const FILES: [(&str, &str); 9] = [
     ("vi", include_str!("../../ui/locales/vi.json")),
     ("zh-TW", include_str!("../../ui/locales/zh-TW.json")),
     ("zh-HK", include_str!("../../ui/locales/zh-HK.json")),
+    ("zh-CN", include_str!("../../ui/locales/zh-CN.json")),
 ];
 
 static LANGUAGES: LazyLock<Vec<(&'static str, Value)>> = LazyLock::new(|| {
