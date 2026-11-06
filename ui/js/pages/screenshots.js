@@ -96,6 +96,10 @@ function build(container) {
     currentShot() && call("show_in_folder", { path: currentShot().path });
   part("delete").onclick = remove;
   part("image").ondblclick = openCurrent;
+  part("image").oncontextmenu = (event) => {
+    event.preventDefault();
+    copy();
+  };
 
   part("view-button").onclick = () => (part("view-list").hidden = !part("view-list").hidden);
   for (const item of part("view-list").querySelectorAll("[data-v]")) {
@@ -299,7 +303,7 @@ function loadThumbs() {
 }
 
 function tile(path, i) {
-  const img = el("img", { alt: "", decoding: "async" });
+  const img = el("img", { alt: "", decoding: "async", draggable: "false" });
   const name = path.split(/[\\/]/).pop().replace(/\.[^.]+$/, "");
   const button = el(
     "button",
@@ -311,6 +315,11 @@ function tile(path, i) {
   button.ondblclick = () => {
     selectShot(i);
     openCurrent();
+  };
+  button.oncontextmenu = async (event) => {
+    event.preventDefault();
+    await selectShot(i);
+    copy();
   };
 
   tileObserver.observe(button);
@@ -333,7 +342,7 @@ function fillViewer() {
     return;
   }
   viewerPath = shot.path;
-  part("image").replaceChildren(el("img", { src: fileUrl(shot.path), alt: "", decoding: "async" }));
+  part("image").replaceChildren(el("img", { src: fileUrl(shot.path), alt: "", decoding: "async", draggable: "false" }));
 }
 
 function emptyViewer() {
