@@ -10,7 +10,7 @@
   <a href="https://github.com/lennmoe/shiori/releases"><img src="https://img.shields.io/github/downloads/lennmoe/shiori/total?color=3BA55D" alt="Release downloads"></a>
   <img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?logo=windows" alt="Windows 10 and 11">
   <img src="https://img.shields.io/badge/size-~10%20MB-2B2D31" alt="About 10 MB">
-  <img src="image/languages.svg" alt="Languages: English, French, Spanish, Portuguese (Brazil), Russian, Japanese, Vietnamese, Traditional Chinese">
+  <img src="image/languages.svg" alt="Languages: English, French, Spanish, Portuguese (Brazil), Russian, Japanese, Vietnamese, Traditional Chinese (Taiwan), Traditional Chinese (Hong Kong)，Simplified Chinese (China)">
 </p>
 
 <p align="center">
@@ -81,7 +81,7 @@ The app updates itself and shows what changed after each update. Full guide: [In
 | **Reading** | Time read per VN and per day · calendar and streaks · progress against the VNDB length · status and rating · description and characters from VNDB |
 | **VNDB** | List sync · random pick from your wishlist when you can't decide · recommendations based on the VNs you liked |
 | **Playing** | Play button and desktop shortcuts, through Steam, Locale Emulator or NTLEA |
-| **Make it yours** | 16 themes or your own colors · your own background image · 8 languages: English, French, Spanish, Portuguese (Brazil), Russian, Japanese, Vietnamese, Traditional Chinese |
+| **Make it yours** | 16 themes or your own colors · your own background image · 10 languages: English, French, Spanish, Portuguese (Brazil), Russian, Japanese, Vietnamese, Traditional Chinese (Taiwan)，Traditional Chinese (Hong Kong)，Simplified Chinese (China) |
 
 <details>
 <summary><b>More screenshots</b></summary>
