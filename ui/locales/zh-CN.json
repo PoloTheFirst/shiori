@@ -120,6 +120,10 @@
     }
   },
   "ui": {
+    "Finished: {names}": "读完：{names}",
+    "Started: {names}": "开始：{names}",
+    "started a VN": "开始读的 VN",
+    "finished a VN": "读完的 VN",
     "“Total read: …”": "“总计阅读时间： …”",
     "“Today: …”": "“今天： …”",
     "Share your mascots": "分享你的吉祥物",

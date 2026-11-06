@@ -147,6 +147,24 @@ function readingDays() {
   return days;
 }
 
+function milestones() {
+  const marks = {};
+  const add = (day, kind, name) => {
+    marks[day] ??= { started: [], finished: [] };
+    marks[day][kind].push(name);
+  };
+  for (const game of games) {
+    const read = Object.entries(game.daily || {}).filter(([, seconds]) => seconds > 0).map(([day]) => day);
+    if (read.length) {
+      add(read.sort()[0], "started", game.name);
+    }
+    if (game.status === "finished" && game.finished_at > 0) {
+      add(isoDay(new Date(game.finished_at * 1000)), "finished", game.name);
+    }
+  }
+  return marks;
+}
+
 function streaks(days) {
   const today = midnight(new Date());
   let day = days[isoDay(today)] ? today : addDays(today, -1);
@@ -185,7 +203,7 @@ function renderActivity() {
   ]
     .filter(Boolean)
     .join("  ·  ");
-  drawHeatmap(part("heatmap"), days);
+  drawHeatmap(part("heatmap"), days, milestones());
 }
 
 function weekSeconds(daily) {

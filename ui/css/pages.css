@@ -558,7 +558,7 @@
   background: var(--surface-hover);
   border: 1px solid var(--border);
   font-size: 12px;
-  white-space: nowrap;
+  white-space: pre;
   pointer-events: none;
   transform: translateX(-50%);
 }
@@ -599,6 +599,50 @@
 
 .heatmap rect.level-4 {
   fill: var(--accent);
+}
+
+.heatmap .heatmap-start {
+  fill: var(--text);
+  pointer-events: none;
+}
+
+.heatmap .heatmap-flag {
+  fill: var(--text);
+  stroke: var(--text);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.heatmap.hide-starts .heatmap-start,
+.heatmap.hide-flags .heatmap-flag,
+.heatmap:not(.hide-flags) .heatmap-start.under-flag {
+  display: none;
+}
+
+.heatmap-legend label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.heatmap-legend input {
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.heatmap .heatmap-flag.many {
+  fill: #f5c542;
+  stroke: #f5c542;
+}
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 6px;
 }
 
 .heatmap rect:hover {

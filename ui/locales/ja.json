@@ -120,6 +120,10 @@
     }
   },
   "ui": {
+    "Finished: {names}": "読了：{names}",
+    "Started: {names}": "読み始め：{names}",
+    "started a VN": "読み始めたVN",
+    "finished a VN": "読了したVN",
     "“Total read: …”": "「合計読書時間：…」",
     "“Today: …”": "「今日：…」",
     "Share your mascots": "マスコットを共有しよう",

@@ -801,6 +801,10 @@
     "Even the ones that aren't on this PC. New ones are added each time the app starts, and a VN you remove from the Library stays out.": "Even the ones that aren't on this PC. New ones are added each time the app starts, and a VN you remove from the Library stays out.",
     "Added {vns} from your VNDB list": "Added {vns} from your VNDB list",
     "Nothing new on your VNDB list": "Nothing new on your VNDB list",
-    "From your VNDB list": "From your VNDB list"
+    "From your VNDB list": "From your VNDB list",
+    "Finished: {names}": "Finished: {names}",
+    "Started: {names}": "Started: {names}",
+    "started a VN": "started a VN",
+    "finished a VN": "finished a VN"
   }
 }

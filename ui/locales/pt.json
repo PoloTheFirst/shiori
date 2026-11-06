@@ -120,6 +120,10 @@
     }
   },
   "ui": {
+    "Finished: {names}": "Terminado: {names}",
+    "Started: {names}": "Começado: {names}",
+    "started a VN": "VN começada",
+    "finished a VN": "VN terminada",
     "“Total read: …”": "“Tempo lido: …”",
     "“Today: …”": "“Hoje: …”",
     "Share your mascots": "Compartilhe seus mascotes",

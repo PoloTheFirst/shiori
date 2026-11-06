@@ -120,6 +120,10 @@
     }
   },
   "ui": {
+    "Finished: {names}": "Пройдено: {names}",
+    "Started: {names}": "Начато: {names}",
+    "started a VN": "начата VN",
+    "finished a VN": "пройдена VN",
     "“Total read: …”": "«Прочитано: …»",
     "“Today: …”": "«Сегодня: …»",
     "Share your mascots": "Делитесь маскотами",

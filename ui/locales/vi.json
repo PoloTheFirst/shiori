@@ -120,6 +120,10 @@
     }
   },
   "ui": {
+    "Finished: {names}": "Đã xong: {names}",
+    "Started: {names}": "Bắt đầu: {names}",
+    "started a VN": "bắt đầu một VN",
+    "finished a VN": "đọc xong một VN",
     "“Total read: …”": "“Tổng thời gian đọc: …”",
     "“Today: …”": "“Hôm nay: …”",
     "Share your mascots": "Chia sẻ linh vật của bạn",

@@ -30,6 +30,8 @@ fn defaults() -> Map<String, Value> {
         "background_dim": 55,
         "background_panels": 80,
         "labs_compact_sidebar": false,
+        "heatmap_starts": true,
+        "heatmap_flags": true,
         "reco_hidden": [],
         "reco_view": "details",
         "split_by_title": false,
