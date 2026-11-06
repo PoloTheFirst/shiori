@@ -760,6 +760,9 @@ fn build_window(
         }
     };
 
+    if let Ok(hwnd) = window.hwnd() {
+        winapi::hide_from_taskbar(hwnd.0 as isize);
+    }
     watch_webview(app, &window, label);
     let _ = window.set_size(PhysicalSize::new(width, height));
     let _ = window.set_position(PhysicalPosition::new(x, y));

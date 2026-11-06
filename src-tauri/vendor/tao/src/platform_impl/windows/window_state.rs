@@ -117,6 +117,8 @@ bitflags! {
 
         const FOCUSABLE = 1 << 23;
 
+        const SKIP_TASKBAR = 1 << 24;
+
         const EXCLUSIVE_FULLSCREEN_OR_MASK = WindowFlags::ALWAYS_ON_TOP.bits();
     }
 }
@@ -252,7 +254,9 @@ impl WindowFlags {
     if self.contains(WindowFlags::VISIBLE) {
       style |= WS_VISIBLE;
     }
-    if self.contains(WindowFlags::ON_TASKBAR) {
+    if self.contains(WindowFlags::SKIP_TASKBAR) {
+      style_ex |= WS_EX_TOOLWINDOW;
+    } else if self.contains(WindowFlags::ON_TASKBAR) {
       style_ex |= WS_EX_APPWINDOW;
     }
     if self.contains(WindowFlags::ALWAYS_ON_TOP) {

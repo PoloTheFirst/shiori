@@ -971,6 +971,13 @@ impl Window {
   #[inline]
   pub(crate) fn set_skip_taskbar(&self, skip: bool) -> Result<(), ExternalError> {
     self.window_state.lock().skip_taskbar = skip;
+    let window = self.window;
+    let window_state = Arc::clone(&self.window_state);
+    self.thread_executor.execute_in_thread(move || {
+      WindowState::set_window_flags(window_state.lock(), window.hwnd(), |f| {
+        f.set(WindowFlags::SKIP_TASKBAR, skip)
+      });
+    });
     unsafe { set_skip_taskbar(self.hwnd(), skip) }
   }
 
@@ -1265,6 +1272,8 @@ unsafe fn init<T: 'static>(
   window_flags.set(WindowFlags::MARKER_DONT_FOCUS, !attributes.focused);
 
   window_flags.set(WindowFlags::RIGHT_TO_LEFT_LAYOUT, pl_attribs.rtl);
+
+  window_flags.set(WindowFlags::SKIP_TASKBAR, pl_attribs.skip_taskbar);
 
   let parent = match pl_attribs.parent {
     Parent::ChildOf(parent) => {
