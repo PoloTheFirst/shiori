@@ -881,6 +881,23 @@
     "Fade": "Fundido",
     "Bounce": "Rebote",
     "Slide": "Deslizar",
-    "Letter by letter": "Letra por letra"
+    "Letter by letter": "Letra por letra",
+    "My VNDB lists": "Mis listas de VNDB",
+    "Random pick": "Al azar",
+    "Hide VNs already in my Library": "Ocultar las VN que ya están en mi biblioteca",
+    "Private list": "Lista privada",
+    "Loading your lists…": "Cargando tus listas…",
+    "In your Library": "En tu biblioteca",
+    "{count} VNs": "{count} VN",
+    "This list is empty on VNDB.": "Esta lista está vacía en VNDB.",
+    "Add your VNDB token in Settings to see your lists.": "Añade tu token de VNDB en Ajustes para ver tus listas.",
+    "Open Settings": "Abrir Ajustes",
+    "Loading…": "Cargando…",
+    "← My VNDB lists": "← Mis listas de VNDB",
+    "Random pick from your VNDB list “{name}”": "Elegida al azar de tu lista de VNDB «{name}»",
+    "Wishlist": "Lista de deseos",
+    "Voted": "Votadas",
+    "Blacklist": "Lista negra",
+    "{position} / {count} in this list": "{position} / {count} en esta lista"
   }
 }

@@ -882,6 +882,23 @@
     "Fade": "フェード",
     "Bounce": "バウンド",
     "Slide": "スライド",
-    "Letter by letter": "一文字ずつ"
+    "Letter by letter": "一文字ずつ",
+    "My VNDB lists": "VNDBのリスト",
+    "Random pick": "ランダムに選ぶ",
+    "Hide VNs already in my Library": "ライブラリにあるVNを隠す",
+    "Private list": "非公開リスト",
+    "Loading your lists…": "リストを読み込み中…",
+    "In your Library": "ライブラリにあり",
+    "{count} VNs": "{count}本のVN",
+    "This list is empty on VNDB.": "VNDBのこのリストは空です。",
+    "Add your VNDB token in Settings to see your lists.": "リストを見るには設定でVNDBトークンを追加してください。",
+    "Open Settings": "設定を開く",
+    "Loading…": "読み込み中…",
+    "← My VNDB lists": "← VNDBのリスト",
+    "Random pick from your VNDB list “{name}”": "VNDBのリスト「{name}」からランダムに選びました",
+    "Wishlist": "ウィッシュリスト",
+    "Voted": "投票済み",
+    "Blacklist": "ブラックリスト",
+    "{position} / {count} in this list": "このリストの{position} / {count}"
   }
 }

@@ -2121,3 +2121,38 @@
     grid-template-columns: 1fr;
   }
 }
+
+.vndb-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0 10px;
+}
+
+.vndb-label {
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.vndb-label:hover {
+  border-color: var(--muted);
+}
+
+.vndb-label.on {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+}
+
+.vndb-label .count {
+  margin-left: 6px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.vndb-tools {
+  margin-bottom: 6px;
+}

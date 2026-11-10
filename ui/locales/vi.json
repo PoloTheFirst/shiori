@@ -881,6 +881,23 @@
     "Fade": "Mờ dần",
     "Bounce": "Nảy",
     "Slide": "Trượt",
-    "Letter by letter": "Từng chữ"
+    "Letter by letter": "Từng chữ",
+    "My VNDB lists": "Danh sách VNDB của tôi",
+    "Random pick": "Chọn ngẫu nhiên",
+    "Hide VNs already in my Library": "Ẩn các VN đã có trong thư viện",
+    "Private list": "Danh sách riêng tư",
+    "Loading your lists…": "Đang tải danh sách…",
+    "In your Library": "Đã có trong thư viện",
+    "{count} VNs": "{count} VN",
+    "This list is empty on VNDB.": "Danh sách này trống trên VNDB.",
+    "Add your VNDB token in Settings to see your lists.": "Thêm token VNDB trong Cài đặt để xem danh sách của bạn.",
+    "Open Settings": "Mở Cài đặt",
+    "Loading…": "Đang tải…",
+    "← My VNDB lists": "← Danh sách VNDB của tôi",
+    "Random pick from your VNDB list “{name}”": "Chọn ngẫu nhiên từ danh sách VNDB “{name}”",
+    "Wishlist": "Danh sách mong muốn",
+    "Voted": "Đã chấm điểm",
+    "Blacklist": "Danh sách đen",
+    "{position} / {count} in this list": "{position} / {count} trong danh sách này"
   }
 }

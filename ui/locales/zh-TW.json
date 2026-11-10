@@ -882,6 +882,23 @@
     "Fade": "淡入",
     "Bounce": "彈跳",
     "Slide": "滑入",
-    "Letter by letter": "逐字顯示"
+    "Letter by letter": "逐字顯示",
+    "My VNDB lists": "我的 VNDB 清單",
+    "Random pick": "隨機挑選",
+    "Hide VNs already in my Library": "隱藏已在收藏庫中的 VN",
+    "Private list": "私人清單",
+    "Loading your lists…": "正在載入你的清單…",
+    "In your Library": "已在收藏庫中",
+    "{count} VNs": "{count} 部 VN",
+    "This list is empty on VNDB.": "這份清單在 VNDB 上是空的。",
+    "Add your VNDB token in Settings to see your lists.": "在設定中加入 VNDB 權杖即可查看你的清單。",
+    "Open Settings": "開啟設定",
+    "Loading…": "載入中…",
+    "← My VNDB lists": "← 我的 VNDB 清單",
+    "Random pick from your VNDB list “{name}”": "從你的 VNDB 清單「{name}」中隨機挑選",
+    "Wishlist": "願望清單",
+    "Voted": "已評分",
+    "Blacklist": "黑名單",
+    "{position} / {count} in this list": "此清單中的 {position} / {count}"
   }
 }

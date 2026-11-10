@@ -13,7 +13,7 @@ const TEMPLATE = `
   <div class="card wish">
     <div class="cover" data-id="cover"></div>
     <div class="info">
-      <div class="eyebrow">Random pick from your VNDB wishlist</div>
+      <div class="eyebrow" data-id="eyebrow">Random pick from your VNDB wishlist</div>
       <h1 data-id="title"></h1>
       <div class="muted" data-id="alt"></div>
       <div class="chips" data-id="chips"></div>
@@ -34,6 +34,9 @@ let position = -1;
 let total = 0;
 let loadedAt = 0;
 let loading = false;
+let label = 5;
+let labelName = "";
+let back = "library";
 
 const part = (id) => $(`[data-id="${id}"]`, root);
 
@@ -41,7 +44,7 @@ function build(container) {
   root = container;
   root.append(html(TEMPLATE));
 
-  part("back").onclick = () => show("library");
+  part("back").onclick = () => show(back);
   part("next").onclick = next;
   part("vndb").onclick = () =>
     current() && call("open_url", { url: `https://vndb.org/${current().id}` });
@@ -69,7 +72,20 @@ function shuffled(wishlist, inLibrary) {
   return list;
 }
 
-async function load() {
+async function load(params = {}) {
+  const wanted = params.label ?? 5;
+  back = params.from || "library";
+  part("back").textContent = back === "vndb-lists" ? t("← My VNDB lists") : t("← Library");
+  if (wanted !== label) {
+    label = wanted;
+    order = [];
+    position = -1;
+  }
+  labelName = params.name || labelName;
+  part("eyebrow").textContent =
+    label === 5
+      ? t("Random pick from your VNDB wishlist")
+      : t("Random pick from your VNDB list “{name}”", { name: label < 10 ? t(labelName) : labelName });
   if (loading || (order.length && Date.now() - loadedAt < STALE_AFTER_MS)) {
     return;
   }
@@ -80,7 +96,7 @@ async function load() {
   }
 
   try {
-    const { wishlist, in_library } = await call("get_wishlist");
+    const { vns: wishlist, in_library } = await call("get_vndb_list", { label });
     loadedAt = Date.now();
 
     if (!wishlist.length) {
@@ -148,7 +164,10 @@ function render() {
 
   const skipped = total - order.length;
   part("status").textContent =
-    t("{position} / {count} on your wishlist", { position: position + 1, count: order.length }) +
+    t(label === 5 ? "{position} / {count} on your wishlist" : "{position} / {count} in this list", {
+      position: position + 1,
+      count: order.length,
+    }) +
     (skipped ? "  ·  " + t("{count} already in your Library skipped", { count: skipped }) : "");
 
   setCover(part("cover"), {
@@ -165,7 +184,7 @@ register({
   show: load,
   onKey: (event) => {
     if (event.key === "Escape") {
-      show("library");
+      show(back);
     } else if (event.key === " ") {
       event.preventDefault();
       next();

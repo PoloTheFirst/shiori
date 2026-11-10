@@ -48,7 +48,7 @@ const TEMPLATE = `
       <button class="sort-dir" data-id="reverse" title="Reverse order"></button>
     </div>
     <div class="row">
-      <button class="btn secondary" data-id="wishlist">Random from wishlist</button>
+      <button class="btn secondary" data-id="wishlist">My VNDB lists</button>
       <select data-id="status">
         <option value="">All statuses</option>
         <option value="playing">Reading</option>

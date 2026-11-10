@@ -229,6 +229,8 @@ fn main() {
             commands::library::get_vote,
             commands::library::set_vote,
             commands::library::get_wishlist,
+            commands::library::get_vndb_labels,
+            commands::library::get_vndb_list,
             commands::covers::search_vndb,
             commands::covers::release_covers,
             commands::covers::set_game_vn,

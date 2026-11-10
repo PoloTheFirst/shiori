@@ -414,6 +414,42 @@ pub async fn set_vote(
     blocking(move || vndb_list::set_vote(&shared, &key, vote)).await
 }
 
+fn token_and_library(shared: &Shared) -> Result<(String, Vec<String>), String> {
+    let cfg = shared.config.lock().unwrap();
+    let ids: Vec<String> = cfg
+        .all_games()
+        .values()
+        .flat_map(|e| [text(e, "vndb_id"), text(e, "matched_vndb_id")])
+        .filter(|id| !id.is_empty())
+        .collect();
+    let token = cfg.str("vndb_token").trim().to_string();
+    if token.is_empty() {
+        return Err("add your VNDB token in Settings first".into());
+    }
+    Ok((token, ids))
+}
+
+#[tauri::command]
+pub async fn get_vndb_labels(shared: SharedState<'_>) -> Result<Value, String> {
+    let shared = Arc::clone(&shared);
+    blocking(move || {
+        let (token, _) = token_and_library(&shared)?;
+        Ok(json!({ "labels": shared.vndb.labels(&token)? }))
+    })
+    .await
+}
+
+#[tauri::command]
+pub async fn get_vndb_list(shared: SharedState<'_>, label: i64) -> Result<Value, String> {
+    let shared = Arc::clone(&shared);
+    blocking(move || {
+        let (token, in_library) = token_and_library(&shared)?;
+        let vns: Vec<VnResult> = shared.vndb.label_list(&token, label)?;
+        Ok(json!({ "vns": vns, "in_library": in_library }))
+    })
+    .await
+}
+
 #[tauri::command]
 pub async fn get_wishlist(shared: SharedState<'_>) -> Result<Value, String> {
     let shared = Arc::clone(&shared);

@@ -882,6 +882,23 @@
     "Fade": "Fade",
     "Bounce": "Bounce",
     "Slide": "Slide",
-    "Letter by letter": "Letter by letter"
+    "Letter by letter": "Letter by letter",
+    "My VNDB lists": "My VNDB lists",
+    "Random pick": "Random pick",
+    "Hide VNs already in my Library": "Hide VNs already in my Library",
+    "Private list": "Private list",
+    "Loading your lists…": "Loading your lists…",
+    "In your Library": "In your Library",
+    "{count} VNs": "{count} VNs",
+    "This list is empty on VNDB.": "This list is empty on VNDB.",
+    "Add your VNDB token in Settings to see your lists.": "Add your VNDB token in Settings to see your lists.",
+    "Open Settings": "Open Settings",
+    "Loading…": "Loading…",
+    "← My VNDB lists": "← My VNDB lists",
+    "Random pick from your VNDB list “{name}”": "Random pick from your VNDB list “{name}”",
+    "Wishlist": "Wishlist",
+    "Voted": "Voted",
+    "Blacklist": "Blacklist",
+    "{position} / {count} in this list": "{position} / {count} in this list"
   }
 }

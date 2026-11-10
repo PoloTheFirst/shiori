@@ -881,6 +881,23 @@
     "Fade": "Проявление",
     "Bounce": "Отскок",
     "Slide": "Скольжение",
-    "Letter by letter": "По буквам"
+    "Letter by letter": "По буквам",
+    "My VNDB lists": "Мои списки VNDB",
+    "Random pick": "Случайно",
+    "Hide VNs already in my Library": "Скрыть новеллы, которые уже в библиотеке",
+    "Private list": "Личный список",
+    "Loading your lists…": "Загружаю твои списки…",
+    "In your Library": "В твоей библиотеке",
+    "{count} VNs": "Новелл: {count}",
+    "This list is empty on VNDB.": "Этот список на VNDB пуст.",
+    "Add your VNDB token in Settings to see your lists.": "Добавь токен VNDB в настройках, чтобы видеть свои списки.",
+    "Open Settings": "Открыть настройки",
+    "Loading…": "Загрузка…",
+    "← My VNDB lists": "← Мои списки VNDB",
+    "Random pick from your VNDB list “{name}”": "Случайный выбор из твоего списка VNDB «{name}»",
+    "Wishlist": "Список желаний",
+    "Voted": "Оценённые",
+    "Blacklist": "Чёрный список",
+    "{position} / {count} in this list": "{position} / {count} в этом списке"
   }
 }
