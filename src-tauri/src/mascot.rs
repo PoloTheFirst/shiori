@@ -491,6 +491,34 @@ pub(crate) fn set_height(shared: &Shared, id: &str, height: u32) -> u32 {
     height
 }
 
+pub(crate) fn setting_for(shared: &Shared, key: &str, id: &str) -> Value {
+    shared
+        .config
+        .lock()
+        .unwrap()
+        .get(key)
+        .and_then(|all| all.get(id))
+        .cloned()
+        .unwrap_or(Value::Null)
+}
+
+pub(crate) fn set_setting_for(shared: &Shared, key: &str, id: &str, value: Value) {
+    let mut all = shared
+        .config
+        .lock()
+        .unwrap()
+        .get(key)
+        .and_then(Value::as_object)
+        .cloned()
+        .unwrap_or_default();
+    if value.is_null() {
+        all.remove(id);
+    } else {
+        all.insert(id.to_string(), value);
+    }
+    save_settings(shared, Map::from_iter([(key.to_string(), Value::Object(all))]));
+}
+
 pub fn remove_from_gallery(shared: &Shared, id: &str) -> Result<(), String> {
     if id == BUILT_IN_ID {
         return Err("The default mascot can't be removed.".into());
@@ -500,6 +528,8 @@ pub fn remove_from_gallery(shared: &Shared, id: &str) -> Result<(), String> {
         std::fs::remove_file(file).map_err(|e| e.to_string())?;
     }
     let _ = std::fs::remove_dir_all(voices_dir(shared, id));
+    set_setting_for(shared, "mascot_balloons", id, Value::Null);
+    set_setting_for(shared, "mascot_voice_volumes", id, Value::Null);
     set_name(shared, id, "");
     Ok(())
 }

@@ -24,7 +24,15 @@ const MAX_LINE: usize = 300;
 const MAX_LIST: usize = 20;
 
 const TEXT_LINES: [&str; 6] = ["start", "stop", "idle", "back", "section", "screenshot"];
-const LIST_LINES: [&str; 2] = ["pokes", "chatter"];
+const LIST_LINES: [&str; 3] = ["pokes", "chatter", "reading"];
+
+const BALLOONS: &str = "mascot_balloons";
+const VOLUMES: &str = "mascot_voice_volumes";
+const BALLOON_COLORS: [&str; 3] = ["bg", "border", "text"];
+const BALLOON_SIZES: [(&str, u64, u64); 3] = [("width", 0, 6), ("radius", 0, 30), ("size", 11, 20)];
+const BALLOON_FLAGS: [&str; 3] = ["tail", "shadow", "bold"];
+const BALLOON_FONTS: [&str; 5] = ["app", "rounded", "serif", "mono", "hand"];
+const BALLOON_ANIMS: [&str; 5] = ["pop", "fade", "bounce", "slide", "type"];
 
 pub fn is_pack(path: &Path) -> bool {
     path.extension().is_some_and(|ext| ext.eq_ignore_ascii_case(EXTENSION))
@@ -49,6 +57,8 @@ pub fn export(shared: &Shared, id: &str, dest: &Path) -> Result<(), String> {
         "personality": mascot::personality_of(shared, id),
         "lines": mascot::custom_lines_of(shared, id),
         "view_only": mascot::view_only_of(shared, id),
+        "balloon": mascot::setting_for(shared, BALLOONS, id),
+        "voice_volume": mascot::setting_for(shared, VOLUMES, id),
     });
 
     let part = dest.with_extension("part");
@@ -145,6 +155,12 @@ fn import_into(
     if manifest["view_only"].as_bool() == Some(true) {
         mascot::set_view_only(shared, &[id.clone()], true);
     }
+    if let Some(balloon) = clean_balloon(&manifest["balloon"]) {
+        mascot::set_setting_for(shared, BALLOONS, &id, balloon);
+    }
+    if let Some(volume) = manifest["voice_volume"].as_u64() {
+        mascot::set_setting_for(shared, VOLUMES, &id, json!(volume.min(100)));
+    }
     if let Err(error) = add_voices(shared, &id, zip, staging) {
         let _ = mascot::remove_from_gallery(shared, &id);
         return Err(error);
@@ -226,6 +242,44 @@ fn clean_lines(lines: &Value) -> Value {
     Value::Object(clean)
 }
 
+fn is_color(text: &str) -> bool {
+    text.len() == 7 && text.starts_with('#') && text[1..].chars().all(|c| c.is_ascii_hexdigit())
+}
+
+fn clean_balloon(balloon: &Value) -> Option<Value> {
+    let balloon = balloon.as_object()?;
+    let mut clean = Map::new();
+    for key in BALLOON_COLORS {
+        if let Some(color) = balloon.get(key).and_then(Value::as_str).filter(|c| is_color(c)) {
+            clean.insert(key.into(), json!(color.to_lowercase()));
+        }
+    }
+    for (key, min, max) in BALLOON_SIZES {
+        if let Some(n) = balloon.get(key).and_then(Value::as_u64) {
+            clean.insert(key.into(), json!(n.clamp(min, max)));
+        }
+    }
+    for key in BALLOON_FLAGS {
+        if let Some(on) = balloon.get(key).and_then(Value::as_bool) {
+            clean.insert(key.into(), json!(on));
+        }
+    }
+    if let Some(font) = balloon.get("font").and_then(Value::as_str).filter(|f| BALLOON_FONTS.contains(f)) {
+        clean.insert("font".into(), json!(font));
+    }
+    if let Some(anim) = balloon.get("anim").and_then(Value::as_str).filter(|a| BALLOON_ANIMS.contains(a)) {
+        clean.insert("anim".into(), json!(anim));
+    }
+    let pos: Option<Vec<f64>> = balloon
+        .get("pos")
+        .and_then(Value::as_array)
+        .map(|p| p.iter().filter_map(Value::as_f64).filter(|n| n.is_finite()).collect());
+    if let Some([x, y]) = pos.as_deref() {
+        clean.insert("pos".into(), json!([x.clamp(-3.0, 4.0), y.clamp(-3.0, 4.0)]));
+    }
+    (!clean.is_empty()).then_some(Value::Object(clean))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -239,6 +293,35 @@ mod tests {
         assert_eq!(voice_target("voices/poke/a.exe"), None);
         assert_eq!(voice_target("voices/poke/.mp3"), None);
         assert_eq!(voice_target("image.png"), None);
+    }
+
+    #[test]
+    fn balloon_keeps_only_safe_values() {
+        let balloon = json!({
+            "bg": "#FFAA00",
+            "border": "red; background:url(x)",
+            "text": null,
+            "width": 40,
+            "size": 2,
+            "font": "\"Evil\"",
+            "tail": true,
+            "anim": "type",
+            "pos": [9.5, 0.25],
+            "evil": 1,
+        });
+        let clean = clean_balloon(&balloon).unwrap();
+        assert_eq!(clean["bg"], "#ffaa00");
+        assert!(clean.get("border").is_none());
+        assert!(clean.get("text").is_none());
+        assert_eq!(clean["width"], 6);
+        assert_eq!(clean["size"], 11);
+        assert!(clean.get("font").is_none());
+        assert_eq!(clean["tail"], true);
+        assert_eq!(clean["anim"], "type");
+        assert_eq!(clean["pos"], json!([4.0, 0.25]));
+        assert!(clean.get("evil").is_none());
+        assert!(clean_balloon(&json!("nope")).is_none());
+        assert!(clean_balloon(&json!({ "pos": [1] })).is_none());
     }
 
     #[test]
