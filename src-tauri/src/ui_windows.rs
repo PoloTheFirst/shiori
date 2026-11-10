@@ -162,22 +162,22 @@ pub fn current_toast() -> Option<Toast> {
     TOAST.lock().unwrap().clone()
 }
 
-static BALLOON_TEXT: Mutex<String> = Mutex::new(String::new());
+static BALLOON_TEXT: Mutex<(String, String)> = Mutex::new((String::new(), String::new()));
 static BALLOON_GENERATION: AtomicU64 = AtomicU64::new(0);
 static BUBBLE: Mutex<Option<(i32, i32, i32, i32)>> = Mutex::new(None);
 static BUBBLE_WATCH: AtomicBool = AtomicBool::new(false);
 
-pub fn show_balloon(app: &AppHandle, text: &str, seconds: f64) {
-    *BALLOON_TEXT.lock().unwrap() = text.to_string();
+pub fn show_balloon(app: &AppHandle, mascot: &str, text: &str, seconds: f64) {
+    *BALLOON_TEXT.lock().unwrap() = (text.to_string(), mascot.to_string());
 
     let app = app.clone();
-    let text = text.to_string();
+    let said = balloon_text();
     std::thread::spawn(move || {
         let app = &app;
         let Some(window) = popup(app, "balloon", "balloon.html", 300.0, 220.0) else {
             return;
         };
-        let _ = window.emit("say", &text);
+        let _ = window.emit("say", &said);
 
         let mine = BALLOON_GENERATION.fetch_add(1, Ordering::SeqCst) + 1;
         std::thread::sleep(Duration::from_secs_f64(seconds));
@@ -187,11 +187,12 @@ pub fn show_balloon(app: &AppHandle, text: &str, seconds: f64) {
     });
 }
 
-pub fn balloon_text() -> String {
-    BALLOON_TEXT.lock().unwrap().clone()
+pub fn balloon_text() -> serde_json::Value {
+    let (text, mascot) = BALLOON_TEXT.lock().unwrap().clone();
+    serde_json::json!({ "text": text, "mascot": mascot })
 }
 
-pub fn place_balloon(app: &AppHandle, width: u32, height: u32) -> &'static str {
+pub fn place_balloon(app: &AppHandle, width: u32, height: u32, anchor: Option<(f64, f64)>) -> &'static str {
     let Some(speaker) = crate::mascot::speaker() else {
         return "left";
     };
@@ -211,15 +212,26 @@ pub fn place_balloon(app: &AppHandle, width: u32, height: u32) -> &'static str {
 
     let (bw, bh) = (width as i32, height as i32);
     let (cw, ch) = (size.width as i32, size.height as i32);
-    let (left, top, right, _) = winapi::work_area_at(pos.x + cw / 2, pos.y + ch / 2);
+    let (left, top, right, bottom) = winapi::work_area_at(pos.x + cw / 2, pos.y + ch / 2);
 
-    let mut x = pos.x - bw + cw / 6;
-    let before = x >= left;
-    if !before {
-        x = pos.x + cw - cw / 6;
-    }
+    let (x, y, before) = match anchor {
+        Some((ax, ay)) if ax.is_finite() && ay.is_finite() => {
+            let (ax, ay) = (ax.clamp(-3.0, 4.0), ay.clamp(-3.0, 4.0));
+            let x = pos.x + (ax * cw as f64) as i32 - bw / 2;
+            let y = pos.y + (ay * ch as f64) as i32 - bh / 2;
+            (x, y, ax < 0.5)
+        }
+        _ => {
+            let mut x = pos.x - bw + cw / 6;
+            let before = x >= left;
+            if !before {
+                x = pos.x + cw - cw / 6;
+            }
+            (x, top.max(pos.y + ch / 10), before)
+        }
+    };
     let x = x.clamp(left, (right - bw).max(left));
-    let y = top.max(pos.y + ch / 10);
+    let y = y.clamp(top, (bottom - bh).max(top));
 
     let target = if before {
         PhysicalPosition::new(x + bw - frame.width as i32, y)

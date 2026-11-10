@@ -26,19 +26,7 @@ body.balloon-window.right {
   justify-content: flex-end;
 }
 
-.balloon {
-  display: inline-block;
-  max-width: 260px;
-  max-height: calc(100vh - 8px);
-  overflow: hidden;
-  margin: 2px;
-  padding: 12px 16px;
-  border-radius: 16px;
-  background: var(--surface);
-  border: 2px solid var(--accent);
-  color: var(--text);
-  font-size: 13px;
-  line-height: 1.4;
+.balloon-window .balloon {
   cursor: pointer;
   opacity: 0;
   visibility: hidden;
@@ -47,6 +35,10 @@ body.balloon-window.right {
     opacity 0.2s var(--ease),
     transform 0.2s var(--ease),
     visibility 0s linear 0.2s;
+}
+
+.balloon-window .balloon-text {
+  max-height: calc(100vh - 48px);
 }
 
 .balloon.shown {

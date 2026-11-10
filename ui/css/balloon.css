@@ -1,0 +1,132 @@
+.balloon {
+  position: relative;
+  display: inline-block;
+  max-width: 260px;
+  margin: 2px;
+  padding: 12px 16px;
+  border-radius: var(--b-radius, 16px);
+  background: var(--b-bg, var(--surface));
+  border: var(--b-width, 2px) solid var(--b-border, var(--accent));
+  color: var(--b-text, var(--text));
+  font-family: var(--b-font, inherit);
+  font-size: var(--b-size, 13px);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.balloon-text {
+  display: block;
+  overflow: hidden;
+}
+
+.balloon.bold {
+  font-weight: 700;
+}
+
+.balloon.shadow {
+  margin-bottom: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.balloon.tail {
+  margin-left: 12px;
+  margin-right: 12px;
+}
+
+.balloon.tail::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: calc(-7px - var(--b-width, 2px) * 0.7);
+  width: 12px;
+  height: 12px;
+  background: var(--b-bg, var(--surface));
+  border: var(--b-width, 2px) solid var(--b-border, var(--accent));
+  border-top: 0;
+  border-right: 0;
+  transform: rotate(45deg);
+}
+
+.balloon.tail.to-right::after {
+  left: auto;
+  right: calc(-7px - var(--b-width, 2px) * 0.7);
+  border: var(--b-width, 2px) solid var(--b-border, var(--accent));
+  border-bottom: 0;
+  border-left: 0;
+}
+
+.balloon.anim-type {
+  box-sizing: border-box;
+}
+
+.balloon.enter {
+  animation: balloon-pop 0.2s var(--ease) both;
+}
+
+.balloon.enter.anim-fade {
+  animation-name: balloon-fade;
+  animation-duration: 0.4s;
+}
+
+.balloon.enter.anim-bounce {
+  animation-name: balloon-bounce;
+  animation-duration: 0.5s;
+  transform-origin: 0 20px;
+}
+
+.balloon.enter.anim-bounce.to-right {
+  transform-origin: 100% 20px;
+}
+
+.balloon.enter.anim-slide {
+  animation-name: balloon-slide;
+  animation-duration: 0.3s;
+}
+
+.balloon.enter.anim-slide.to-right {
+  animation-name: balloon-slide-back;
+}
+
+@keyframes balloon-pop {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.97);
+  }
+}
+
+@keyframes balloon-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes balloon-bounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  75% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes balloon-slide {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+}
+
+@keyframes balloon-slide-back {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}

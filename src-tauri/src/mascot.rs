@@ -1021,8 +1021,8 @@ fn say_as(
     if !talks {
         return;
     }
-    *SPEAKER.lock().unwrap() = Some(label);
-    ui_windows::show_balloon(app, &said.text, seconds as f64);
+    *SPEAKER.lock().unwrap() = Some(label.clone());
+    ui_windows::show_balloon(app, id_of(&label), &said.text, seconds as f64);
 }
 
 struct Said {

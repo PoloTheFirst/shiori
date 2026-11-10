@@ -1994,3 +1994,130 @@
   display: grid;
   gap: 4px;
 }
+
+.balloon-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
+  gap: 20px;
+  align-items: start;
+}
+
+.balloon-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  position: sticky;
+  top: 0;
+}
+
+.balloon-stage {
+  position: relative;
+  width: 100%;
+  height: min(460px, 62vh);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.04) 25%, transparent 25%) 0 0 / 24px 24px,
+    var(--bg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  touch-action: none;
+}
+
+.balloon-stage img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 84%;
+  max-width: 60%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.balloon-stage .balloon {
+  position: absolute;
+  margin: 0;
+  max-width: 220px;
+  cursor: grab;
+  user-select: none;
+}
+
+.balloon-stage .balloon.tail {
+  margin: 0;
+}
+
+.balloon-stage .balloon.dragging {
+  cursor: grabbing;
+  outline: 2px dashed var(--muted);
+  outline-offset: 4px;
+}
+
+.balloon-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.balloon-controls .field {
+  flex-wrap: nowrap;
+}
+
+.balloon-controls .field > span {
+  min-width: 0;
+}
+
+.balloon-controls .field .row {
+  flex-wrap: nowrap;
+  flex: 0 0 auto;
+}
+
+.balloon-controls .field input[type="range"] {
+  width: 110px;
+}
+
+.balloon-controls .field .muted {
+  width: 34px;
+  text-align: right;
+}
+
+.balloon-presets {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 6px 0 8px;
+}
+
+.balloon-preset {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px 6px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.balloon-preset:hover {
+  border-color: var(--muted);
+}
+
+.balloon-preset.on {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.balloon-preset .balloon {
+  margin: 0;
+  padding: 4px 10px;
+}
+
+@media (max-width: 700px) {
+  .balloon-editor {
+    grid-template-columns: 1fr;
+  }
+}
