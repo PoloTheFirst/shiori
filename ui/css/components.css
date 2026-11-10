@@ -654,6 +654,11 @@ button.chip:hover,
   justify-content: flex-start;
 }
 
+.lang-menu.right {
+  left: auto;
+  right: 0;
+}
+
 .lang-menu button.on::after {
   margin-left: auto;
 }

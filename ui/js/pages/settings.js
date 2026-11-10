@@ -231,13 +231,12 @@ function discordSection() {
 }
 
 function presenceLanguageField() {
-  const select = el("select", {}, el("option", { value: "app" }, t("Same as the app")));
-  select.onchange = () => save({ presence_language: select.value });
-  call("languages").then((languages) => {
-    select.append(...languages.map(({ code, name }) => el("option", { value: code }, name)));
-    select.value = store.settings.presence_language || "app";
+  const picker = languagePicker((code) => save({ presence_language: code }), {
+    current: store.settings.presence_language || "app",
+    first: { code: "app", name: "Same as the app", flag: "__" },
+    right: true,
   });
-  return el("div", { class: "field" }, el("span", {}, "Language on Discord"), select);
+  return el("div", { class: "field" }, el("span", {}, "Language on Discord"), picker);
 }
 
 function titleLanguageField() {
