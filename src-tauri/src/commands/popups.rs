@@ -185,13 +185,18 @@ pub fn toast_action(app: AppHandle, action: String) {
 }
 
 #[tauri::command(async)]
-pub fn balloon_text() -> String {
+pub fn balloon_text() -> serde_json::Value {
     ui_windows::balloon_text()
 }
 
 #[tauri::command(async)]
-pub fn place_balloon(app: AppHandle, width: u32, height: u32) -> &'static str {
-    ui_windows::place_balloon(&app, width, height)
+pub fn place_balloon(
+    app: AppHandle,
+    width: u32,
+    height: u32,
+    anchor: Option<(f64, f64)>,
+) -> &'static str {
+    ui_windows::place_balloon(&app, width, height, anchor)
 }
 
 #[tauri::command(async)]

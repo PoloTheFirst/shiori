@@ -491,6 +491,34 @@ pub(crate) fn set_height(shared: &Shared, id: &str, height: u32) -> u32 {
     height
 }
 
+pub(crate) fn setting_for(shared: &Shared, key: &str, id: &str) -> Value {
+    shared
+        .config
+        .lock()
+        .unwrap()
+        .get(key)
+        .and_then(|all| all.get(id))
+        .cloned()
+        .unwrap_or(Value::Null)
+}
+
+pub(crate) fn set_setting_for(shared: &Shared, key: &str, id: &str, value: Value) {
+    let mut all = shared
+        .config
+        .lock()
+        .unwrap()
+        .get(key)
+        .and_then(Value::as_object)
+        .cloned()
+        .unwrap_or_default();
+    if value.is_null() {
+        all.remove(id);
+    } else {
+        all.insert(id.to_string(), value);
+    }
+    save_settings(shared, Map::from_iter([(key.to_string(), Value::Object(all))]));
+}
+
 pub fn remove_from_gallery(shared: &Shared, id: &str) -> Result<(), String> {
     if id == BUILT_IN_ID {
         return Err("The default mascot can't be removed.".into());
@@ -500,6 +528,8 @@ pub fn remove_from_gallery(shared: &Shared, id: &str) -> Result<(), String> {
         std::fs::remove_file(file).map_err(|e| e.to_string())?;
     }
     let _ = std::fs::remove_dir_all(voices_dir(shared, id));
+    set_setting_for(shared, "mascot_balloons", id, Value::Null);
+    set_setting_for(shared, "mascot_voice_volumes", id, Value::Null);
     set_name(shared, id, "");
     Ok(())
 }
@@ -1002,7 +1032,14 @@ fn say_as(
         (
             cfg.get("mascot_talk").and_then(Value::as_bool).unwrap_or(true),
             lang::resolve(&cfg.str("language")),
-            cfg.get("mascot_voice_volume").and_then(Value::as_u64).unwrap_or(80),
+            cfg.get("mascot_voice_volume").and_then(Value::as_u64).unwrap_or(80)
+                * cfg
+                    .get("mascot_voice_volumes")
+                    .and_then(|v| v.get(id_of(&label)))
+                    .and_then(Value::as_u64)
+                    .unwrap_or(100)
+                    .min(100)
+                / 100,
         )
     };
     let said = line(&lines_for(&shared, id_of(&label), language));
@@ -1014,8 +1051,8 @@ fn say_as(
     if !talks {
         return;
     }
-    *SPEAKER.lock().unwrap() = Some(label);
-    ui_windows::show_balloon(app, &said.text, seconds as f64);
+    *SPEAKER.lock().unwrap() = Some(label.clone());
+    ui_windows::show_balloon(app, id_of(&label), &said.text, seconds as f64);
 }
 
 struct Said {
@@ -1101,13 +1138,7 @@ pub fn start_chatter(app: &AppHandle) {
         if minutes == 0 || now().saturating_sub(LAST_SAID.load(Ordering::SeqCst)) < minutes * 60 {
             continue;
         }
-        say_as(
-            &app,
-            None,
-            "chatter",
-            |lines| pick(&lines.chatter),
-            6,
-        );
+        say_or_talk_about_reading(&app, None, "chatter", |lines| &lines.chatter);
     });
 }
 
@@ -1269,14 +1300,56 @@ pub fn screenshot_saved(app: &AppHandle) {
     say_as(app, None, "screenshot", |lines| just(lines.screenshot.clone()), 3);
 }
 
+struct Reading {
+    name: String,
+    total: String,
+    session: String,
+}
+
+fn reading_now(app: &AppHandle) -> Option<Reading> {
+    let shared = shared(app);
+    let snap = shared.snapshot();
+    if !snap.detected || snap.idle || snap.paused || snap.game_name.is_empty() {
+        return None;
+    }
+    let language = lang::resolve(&shared.config.lock().unwrap().str("language"));
+    let session = if snap.session_start > 0 {
+        crate::config::now() - snap.session_start
+    } else {
+        0
+    };
+    Some(Reading {
+        name: snap.game_name,
+        total: crate::engine::format_playtime(snap.playtime_seconds, language),
+        session: crate::engine::format_playtime(session, language),
+    })
+}
+
+fn about_reading(reading: &Reading, line: &str) -> String {
+    line.replace("{name}", &reading.name)
+        .replace("{total}", &reading.total)
+        .replace("{session}", &reading.session)
+}
+
+fn say_or_talk_about_reading(app: &AppHandle, label: Option<&str>, event: &str, list: fn(&Lines) -> &Vec<String>) {
+    if let Some(reading) = reading_now(app).filter(|_| random(2) == 0) {
+        say_as(
+            app,
+            label,
+            "reading",
+            |lines| {
+                let said = pick(&lines.reading);
+                just(about_reading(&reading, &said.text))
+            },
+            6,
+        );
+        return;
+    }
+    say_as(app, label, event, |lines| pick(list(lines)), 6);
+}
+
 pub fn poke(app: &AppHandle, label: &str) {
-    say_as(
-        app,
-        Some(label),
-        "poke",
-        |lines| pick(&lines.pokes),
-        6,
-    );
+    say_or_talk_about_reading(app, Some(label), "poke", |lines| &lines.pokes);
 }
 
 pub fn react(app: &AppHandle, old: &Snapshot, new: &Snapshot) {

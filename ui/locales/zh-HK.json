@@ -40,6 +40,11 @@
         "仲睇緊阿？你好犀利呀～",
         "見字飲水啊！",
         "緊住落嚟會發生咩事呢……請拭目以待！"
+      ],
+      "reading": [
+        "{name}已經讀咗{total}啦！狀態超好～",
+        "今次已經連續讀咗{session}。要唔要稍為休息一下？",
+        "{name}點樣呀？好想知道之後會點！"
       ]
     },
     "tsundere": {
@@ -59,6 +64,11 @@
         "喂、喂，你已經睇咗好耐啦噃。我先唔係在擔心你啊！",
         "別捱夜到三更通宵，衰鬼。",
         "……好啦，呢段都算唔不錯嘅。"
+      ],
+      "reading": [
+        "{name}讀咗{total}……先、先唔係特登幫你數㗎！",
+        "你已經讀咗{session}喇。唔好整壞對眼呀，笨蛋。",
+        "哼，又係{name}？……好啦，的確幾好睇。"
       ]
     },
     "shy": {
@@ -78,6 +88,11 @@
         "嗰、嗰個……我仲喺度陪你睇緊㗎……",
         "要、要不要做吓伸展？……如果你想嘅話……",
         "一起睇小説……都真係幾美好……"
+      ],
+      "reading": [
+        "嗰、嗰個……{name}已經{total}喇……",
+        "已經{session}喇……要、要唔要伸下懶腰？",
+        "希望{name}對你溫柔啲……"
       ]
     },
     "big_sister": {
@@ -97,6 +112,11 @@
         "你已經讀咁咗耐嗱，好叻呀～",
         "記得要比眼睛休息一陣啊。",
         "哎呀～咁專心，真係可愛㗎啫。"
+      ],
+      "reading": [
+        "{name}讀咗{total}呀？家姐為你驕傲。",
+        "已經連續{session}喇。俾對眼休息一分鐘，好嗎？",
+        "{name}已經整到你喊咗未？家姐喺度呀。"
       ]
     },
     "chuuni": {
@@ -116,10 +136,19 @@
         "其事愈發玄奧，吾自感前途緜遠，必承偉大之天命。",
         "凡夫之志，其韌竟使吾折服！",
         "魔眼既開，則萬象昭然，吾當與汝凝神共矚，字字校勘。"
+      ],
+      "reading": [
+        "向禁書《{name}》獻上咗{total}……了不起。",
+        "汝之靈魂已被文字束縛咗{session}！",
+        "《{name}》嘅預言正在揭曉……繼續讀落去吧，吾之容器！"
       ]
     }
   },
   "ui": {
+    "Finished: {names}": "讀完：{names}",
+    "Started: {names}": "開始：{names}",
+    "started a VN": "開始讀的 VN",
+    "finished a VN": "讀完的 VN",
     "“Total read: …”": "“總計閲讀時間： …”",
     "“Today: …”": "“今天： …”",
     "Share your mascots": "分享你的吉祥物",
@@ -334,6 +363,20 @@
     "Most read": "閱讀最多",
     "Recent": "最近閱讀",
     "A–Z": "A–Z",
+    "Delete…": "刪除…",
+    "Delete {name}?": "刪除 {name}？",
+    "This removes from Shiori:": "這會從 Shiori 中刪除：",
+    "its time read, history and status": "它的閱讀時間、紀錄和狀態",
+    "its covers and VNDB info saved on this PC": "儲存在這部電腦上的封面和 VNDB 資料",
+    "Screenshots are kept. If you start it again, it comes back as a new VN.": "截圖會保留。如果再次啟動，它會以新的 VN 出現。",
+    "{name} was deleted (its screenshots are kept)": "已刪除 {name}（截圖已保留）",
+    "Idle": "閒置",
+    "Top bar": "頂部欄",
+    "Shows the VN you're reading, the search, the status and Pause at the top.": "在頂部顯示正在讀的 VN、搜尋、狀態和暫停。",
+    "Release date": "發售日期",
+    "Reverse order": "反轉順序",
+    "Shelves by year": "按年份分架",
+    "Unknown year": "年份不明",
     "Random from wishlist": "從願望清單中隨機選擇",
     "All statuses": "所有狀態",
     "Playing": "遊玩中",
@@ -660,6 +703,35 @@
     "Clicks go through it.": "點擊會穿透角色。",
     "Voices…": "語音…",
     "Add a sound…": "新增音效…",
+    "Drag the bubble to choose where it shows up next to the mascot.": "拖曳泡泡，選擇它出現在吉祥物旁邊的位置。",
+    "Put it back automatically": "自動放置",
+    "Bubble…": "泡泡…",
+    "{name}'s bubble": "{name}的泡泡",
+    "Hi! This is how I'll talk to you while you read.": "嗨！你閱讀時我會這樣跟你說話。",
+    "Style": "樣式",
+    "Border": "邊框",
+    "Border width": "邊框粗幼",
+    "Roundness": "圓角",
+    "Text size": "文字大小",
+    "Font": "字型",
+    "App font": "應用程式字型",
+    "Rounded": "圓體",
+    "Serif": "襯線",
+    "Monospace": "等寬",
+    "Handwritten": "手寫",
+    "Tail": "尾巴",
+    "Points at the mascot.": "指向吉祥物。",
+    "Shadow": "陰影",
+    "Bold text": "粗體文字",
+    "Reset": "重設",
+    "Paper": "紙張",
+    "Night": "夜晚",
+    "Sakura": "櫻花",
+    "Comic": "漫畫",
+    "Mint": "薄荷",
+    "Minimal": "極簡",
+    "Novel": "小說",
+    "This mascot's volume": "此吉祥物的音量",
     "Choose a sound": "選擇音效",
     "No sound: it only shows the text.": "沒有音效：只顯示文字。",
     "{name}'s voice": "{name} 的語音",
@@ -801,6 +873,32 @@
     "Even the ones that aren't on this PC. New ones are added each time the app starts, and a VN you remove from the Library stays out.": "包含不在此電腦上的作品。每次啟動應用程式時都會加入新作品；從書庫移除的作品不會再次加入。",
     "Added {vns} from your VNDB list": "已從 VNDB 清單加入 {vns}",
     "Nothing new on your VNDB list": "VNDB 清單沒有新作品",
-    "From your VNDB list": "來自你的 VNDB 清單"
+    "From your VNDB list": "來自你的 VNDB 清單",
+    "About the VN you're reading": "關於你正在讀嘅 VN",
+    "{name}: the VN · {total}: time on it · {session}: this session.": "{name}：VN · {total}：喺佢上面嘅時間 · {session}：今次閱讀",
+    "Animation": "動畫",
+    "Replay": "重播",
+    "Pop": "彈出",
+    "Fade": "淡入",
+    "Bounce": "彈跳",
+    "Slide": "滑入",
+    "Letter by letter": "逐字顯示",
+    "My VNDB lists": "我的 VNDB 清單",
+    "Random pick": "隨機揀選",
+    "Hide VNs already in my Library": "隱藏已喺收藏庫嘅 VN",
+    "Private list": "私人清單",
+    "Loading your lists…": "載入緊你嘅清單…",
+    "In your Library": "已喺收藏庫",
+    "{count} VNs": "{count} 部 VN",
+    "This list is empty on VNDB.": "呢份清單喺 VNDB 上係空嘅。",
+    "Add your VNDB token in Settings to see your lists.": "喺設定加入 VNDB 權杖就可以睇你嘅清單。",
+    "Open Settings": "開啟設定",
+    "Loading…": "載入中…",
+    "← My VNDB lists": "← 我的 VNDB 清單",
+    "Random pick from your VNDB list “{name}”": "從你嘅 VNDB 清單「{name}」隨機揀選",
+    "Wishlist": "願望清單",
+    "Voted": "已評分",
+    "Blacklist": "黑名單",
+    "{position} / {count} in this list": "呢份清單嘅 {position} / {count}"
   }
 }

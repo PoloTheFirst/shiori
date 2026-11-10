@@ -320,6 +320,6 @@ mod tests {
         assert_eq!(custom["details"], "{today_read}");
         assert_eq!(fill("{total_read} · {progress}", &sample_vars("en")), "Total read: 35h 11m · 78%");
         assert_eq!(fill("{today_read}", &sample_vars("fr")), "Aujourd'hui : 1 h 20 min");
-        assert_eq!(fill("{total}", &sample_vars("zh-TW")), "35小時11分");
+        assert_eq!(fill("{total}", &sample_vars("zh-TW")), "35小時 11分鐘");
     }
 }

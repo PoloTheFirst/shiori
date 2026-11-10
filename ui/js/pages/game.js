@@ -14,7 +14,7 @@ import {
 import { invoke, fileUrl } from "../tauri.js";
 import { register, show } from "../router.js";
 import { store, subscribe } from "../store.js";
-import { ask, call, confirmButton, openDialog, segmented, setCover, toast } from "../ui.js";
+import { ask, call, openDialog, segmented, setCover, toast } from "../ui.js";
 import { drawChart } from "../components/chart.js";
 import { LAUNCHERS, createShortcut, locateGame, locateTool, playGame } from "../components/play.js";
 import { t } from "../i18n.js";
@@ -224,11 +224,36 @@ async function load() {
 
   part("play").hidden = !exe;
   part("shortcut").hidden = !exe;
-  confirmButton(part("remove"), "Remove", async () => {
-    await call("remove_game", { key });
-    toast(t("{name} was removed (its screenshots are kept)", { name: game.name }));
-    show("library");
+  part("remove").textContent = t("Delete…");
+  part("remove").onclick = () => deleteGame(key, game.name);
+}
+
+async function deleteGame(key, name) {
+  const sure = await openDialog({
+    title: t("Delete {name}?", { name }),
+    body: el(
+      "div",
+      { class: "delete-list" },
+      el("p", { class: "muted" }, "This removes from Shiori:"),
+      el(
+        "ul",
+        {},
+        el("li", {}, "its time read, history and status"),
+        el("li", {}, "its covers and VNDB info saved on this PC"),
+      ),
+      el("p", { class: "hint-text" }, "Screenshots are kept. If you start it again, it comes back as a new VN."),
+    ),
+    actions: [
+      { label: "Cancel", kind: "secondary", value: false },
+      { label: "Delete", kind: "danger", value: true },
+    ],
   });
+  if (!sure) {
+    return;
+  }
+  await call("delete_game", { key });
+  toast(t("{name} was deleted (its screenshots are kept)", { name }));
+  show("library");
 }
 
 function renderVndb(entry) {

@@ -3759,11 +3759,12 @@ dependencies = [
 
 [[package]]
 name = "shiori"
-version = "2.2.3"
+version = "2.3.0"
 dependencies = [
  "base64 0.23.1",
  "chrono",
  "fancy-regex",
+ "flate2",
  "image",
  "ort",
  "png 0.18.1",

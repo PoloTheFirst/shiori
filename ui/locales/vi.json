@@ -40,6 +40,11 @@
         "Vẫn đang đọc à? Giỏi lắm~",
         "Đừng quên uống nước nhé!",
         "Không biết chuyện gì sẽ xảy ra… đọc tiếp đi!"
+      ],
+      "reading": [
+        "Đã {total} với {name} rồi! Bạn đang rất hăng say~",
+        "Đọc liền {session} rồi. Sắp nghỉ một chút nhé?",
+        "{name} thế nào rồi? Mình muốn biết chuyện gì xảy ra tiếp!"
       ]
     },
     "tsundere": {
@@ -59,6 +64,11 @@
         "N-này, cậu đọc lâu rồi đấy. Không phải tớ lo đâu nhé!",
         "Đừng thức khuya quá, đồ ngốc.",
         "…Thôi được, đoạn này cũng hay."
+      ],
+      "reading": [
+        "{total} với {name}... K-không phải mình đếm giùm bạn đâu nhé!",
+        "Bạn đọc {session} rồi đó. Đừng làm hại mắt, đồ ngốc.",
+        "Hừm, lại {name} à? ...Được thôi, truyện hay mà."
       ]
     },
     "shy": {
@@ -78,6 +88,11 @@
         "Ư-ừm… tớ vẫn ở đây, đọc cùng cậu…",
         "D-duỗi người một chút nhé? …Nếu cậu muốn…",
         "Thật dễ chịu… khi đọc cùng nhau…"
+      ],
+      "reading": [
+        "Ư-ưm... đã {total} với {name} rồi...",
+        "Đã {session} rồi... b-bạn vươn vai chút nhé?",
+        "Mong là {name} đối xử tốt với bạn..."
       ]
     },
     "big_sister": {
@@ -97,6 +112,11 @@
         "Em đọc lâu rồi đó, cưng. Chị tự hào về em~",
         "Nhớ cho mắt nghỉ ngơi nhé?",
         "Ara~ Tập trung ghê. Dễ thương quá."
+      ],
+      "reading": [
+        "{total} với {name} rồi à? Chị tự hào về em.",
+        "Đã {session} liền rồi. Cho mắt nghỉ một phút nhé?",
+        "{name} làm em khóc chưa? Chị ở đây nè."
       ]
     },
     "chuuni": {
@@ -116,10 +136,19 @@
         "Câu chuyện ngày càng sâu… ta cảm nhận được định mệnh vĩ đại!",
         "Phàm nhân, sức bền của ngươi khiến ta kinh ngạc!",
         "Con mắt bóng tối của ta dõi theo từng dòng cùng ngươi…"
+      ],
+      "reading": [
+        "{total} hiến dâng cho cấm thư {name}... ấn tượng đấy.",
+        "Linh hồn ngươi đã bị trói vào trang sách suốt {session}!",
+        "Lời tiên tri của {name} đang hé lộ... đọc tiếp đi, kẻ được chọn!"
       ]
     }
   },
   "ui": {
+    "Finished: {names}": "Đã xong: {names}",
+    "Started: {names}": "Bắt đầu: {names}",
+    "started a VN": "bắt đầu một VN",
+    "finished a VN": "đọc xong một VN",
     "“Total read: …”": "“Tổng thời gian đọc: …”",
     "“Today: …”": "“Hôm nay: …”",
     "Share your mascots": "Chia sẻ linh vật của bạn",
@@ -334,6 +363,20 @@
     "Most read": "Đọc nhiều nhất",
     "Recent": "Gần đây",
     "A–Z": "A–Z",
+    "Delete…": "Xóa…",
+    "Delete {name}?": "Xóa {name}?",
+    "This removes from Shiori:": "Thao tác này xóa khỏi Shiori:",
+    "its time read, history and status": "thời gian đọc, lịch sử và trạng thái",
+    "its covers and VNDB info saved on this PC": "ảnh bìa và thông tin VNDB lưu trên máy này",
+    "Screenshots are kept. If you start it again, it comes back as a new VN.": "Ảnh chụp màn hình được giữ lại. Nếu mở lại, nó sẽ hiện như một VN mới.",
+    "{name} was deleted (its screenshots are kept)": "Đã xóa {name} (ảnh chụp màn hình được giữ lại)",
+    "Idle": "Đang rảnh",
+    "Top bar": "Thanh trên cùng",
+    "Shows the VN you're reading, the search, the status and Pause at the top.": "Hiện VN đang đọc, tìm kiếm, trạng thái và Tạm dừng ở phía trên.",
+    "Release date": "Ngày phát hành",
+    "Reverse order": "Đảo thứ tự",
+    "Shelves by year": "Kệ theo năm",
+    "Unknown year": "Không rõ năm",
     "Random from wishlist": "Ngẫu nhiên từ wishlist",
     "All statuses": "Mọi trạng thái",
     "Playing": "Đang đọc",
@@ -659,6 +702,35 @@
     "Clicks go through it.": "Nhấp chuột xuyên qua.",
     "Voices…": "Giọng nói…",
     "Add a sound…": "Thêm âm thanh…",
+    "Drag the bubble to choose where it shows up next to the mascot.": "Kéo bong bóng để chọn vị trí nó hiện cạnh linh vật.",
+    "Put it back automatically": "Tự động đặt vị trí",
+    "Bubble…": "Bong bóng…",
+    "{name}'s bubble": "Bong bóng của {name}",
+    "Hi! This is how I'll talk to you while you read.": "Chào! Mình sẽ nói chuyện với bạn như thế này khi bạn đọc.",
+    "Style": "Kiểu",
+    "Border": "Viền",
+    "Border width": "Độ dày viền",
+    "Roundness": "Bo góc",
+    "Text size": "Cỡ chữ",
+    "Font": "Phông chữ",
+    "App font": "Phông của ứng dụng",
+    "Rounded": "Bo tròn",
+    "Serif": "Có chân",
+    "Monospace": "Đơn cách",
+    "Handwritten": "Viết tay",
+    "Tail": "Đuôi",
+    "Points at the mascot.": "Chỉ về phía linh vật.",
+    "Shadow": "Bóng đổ",
+    "Bold text": "Chữ đậm",
+    "Reset": "Đặt lại",
+    "Paper": "Giấy",
+    "Night": "Đêm",
+    "Sakura": "Sakura",
+    "Comic": "Truyện tranh",
+    "Mint": "Bạc hà",
+    "Minimal": "Tối giản",
+    "Novel": "Tiểu thuyết",
+    "This mascot's volume": "Âm lượng của linh vật này",
     "Choose a sound": "Chọn âm thanh",
     "No sound: it only shows the text.": "Không có âm thanh: chỉ hiện chữ.",
     "{name}'s voice": "Giọng của {name}",
@@ -800,6 +872,32 @@
     "Even the ones that aren't on this PC. New ones are added each time the app starts, and a VN you remove from the Library stays out.": "Kể cả những VN không có trên máy này. VN mới được thêm mỗi lần mở ứng dụng, và VN bạn xóa khỏi thư viện sẽ không quay lại.",
     "Added {vns} from your VNDB list": "Đã thêm {vns} từ danh sách VNDB",
     "Nothing new on your VNDB list": "Không có gì mới trong danh sách VNDB",
-    "From your VNDB list": "Từ danh sách VNDB"
+    "From your VNDB list": "Từ danh sách VNDB",
+    "About the VN you're reading": "Về VN bạn đang đọc",
+    "{name}: the VN · {total}: time on it · {session}: this session.": "{name}: tên VN · {total}: thời gian đã đọc · {session}: phiên này.",
+    "Animation": "Hiệu ứng",
+    "Replay": "Phát lại",
+    "Pop": "Bật lên",
+    "Fade": "Mờ dần",
+    "Bounce": "Nảy",
+    "Slide": "Trượt",
+    "Letter by letter": "Từng chữ",
+    "My VNDB lists": "Danh sách VNDB của tôi",
+    "Random pick": "Chọn ngẫu nhiên",
+    "Hide VNs already in my Library": "Ẩn các VN đã có trong thư viện",
+    "Private list": "Danh sách riêng tư",
+    "Loading your lists…": "Đang tải danh sách…",
+    "In your Library": "Đã có trong thư viện",
+    "{count} VNs": "{count} VN",
+    "This list is empty on VNDB.": "Danh sách này trống trên VNDB.",
+    "Add your VNDB token in Settings to see your lists.": "Thêm token VNDB trong Cài đặt để xem danh sách của bạn.",
+    "Open Settings": "Mở Cài đặt",
+    "Loading…": "Đang tải…",
+    "← My VNDB lists": "← Danh sách VNDB của tôi",
+    "Random pick from your VNDB list “{name}”": "Chọn ngẫu nhiên từ danh sách VNDB “{name}”",
+    "Wishlist": "Danh sách mong muốn",
+    "Voted": "Đã chấm điểm",
+    "Blacklist": "Danh sách đen",
+    "{position} / {count} in this list": "{position} / {count} trong danh sách này"
   }
 }

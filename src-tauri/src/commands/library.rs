@@ -78,11 +78,56 @@ pub fn get_library(shared: SharedState) -> Vec<Value> {
                 "has_path": !launcher::launch_exe(&entry).is_empty(),
                 "from_vndb": entry.get("vndb_list_only").and_then(Value::as_bool).unwrap_or(false)
                     && launcher::launch_exe(&entry).is_empty(),
+                "released": if text(&entry, "released_vn") == vn_id { text(&entry, "released") } else { String::new() },
                 "vndb_id": vn_id,
                 "cover": cover_of(&cfg, &entry),
             })
         })
         .collect()
+}
+
+#[tauri::command]
+pub async fn fill_release_dates(shared: SharedState<'_>) -> Result<usize, String> {
+    let shared = Arc::clone(&shared);
+    blocking(move || {
+        let missing: Vec<(String, String)> = {
+            let cfg = shared.config.lock().unwrap();
+            visible_games(&cfg)
+                .into_iter()
+                .filter_map(|(key, entry)| {
+                    let vn_id = [text(&entry, "vndb_id"), text(&entry, "matched_vndb_id")]
+                        .into_iter()
+                        .find(|id| !id.is_empty())?;
+                    (text(&entry, "released_vn") != vn_id).then_some((key, vn_id))
+                })
+                .collect()
+        };
+        if missing.is_empty() {
+            return Ok(0);
+        }
+        let mut ids: Vec<String> = missing.iter().map(|(_, id)| id.clone()).collect();
+        ids.sort();
+        ids.dedup();
+        let dates: std::collections::HashMap<String, String> =
+            shared.vndb.release_dates(&ids)?.into_iter().collect();
+        {
+            let mut cfg = shared.config.lock().unwrap();
+            for (key, vn_id) in &missing {
+                let date = dates.get(vn_id).cloned().unwrap_or_default();
+                cfg.set_game(
+                    key,
+                    Map::from_iter([
+                        ("released".into(), json!(date)),
+                        ("released_vn".into(), json!(vn_id)),
+                    ]),
+                );
+            }
+        }
+        shared.send(Cmd::Reload);
+        shared.emit("library-changed", json!({}));
+        Ok(missing.len())
+    })
+    .await
 }
 
 #[tauri::command(async)]
@@ -170,14 +215,18 @@ pub fn set_playtime(shared: SharedState, key: String, seconds: i64) {
     shared.emit("library-changed", json!({ "key": key }));
 }
 
-#[tauri::command(async)]
-pub fn remove_game(shared: SharedState, key: String) -> Result<(), String> {
+fn forget_game(shared: &Shared, key: &str, with_files: bool) -> Result<usize, String> {
     let snap = shared.snapshot();
     if snap.detected && snap.key == key {
         return Err("Close the game before removing it.".into());
     }
-    {
+    let files = {
         let mut cfg = shared.config.lock().unwrap();
+        let files = if with_files {
+            cfg.files_of(key)
+        } else {
+            vec![]
+        };
         if let Some(id) = key.strip_prefix(vndb_list::IMPORTED_PREFIX) {
             let mut ignored = cfg
                 .get("vndb_import_ignored")
@@ -185,12 +234,30 @@ pub fn remove_game(shared: SharedState, key: String) -> Result<(), String> {
                 .cloned()
                 .unwrap_or_default();
             ignored.push(json!(id));
-            let _ = cfg.update(Map::from_iter([("vndb_import_ignored".into(), json!(ignored))]));
+            let _ = cfg.update(Map::from_iter([(
+                "vndb_import_ignored".into(),
+                json!(ignored),
+            )]));
         }
-        cfg.remove_game(&key);
-    }
-    changed(&shared, &key);
-    Ok(())
+        cfg.remove_game(key);
+        files
+    };
+    let removed = files
+        .iter()
+        .filter(|file| std::fs::remove_file(file).is_ok())
+        .count();
+    changed(shared, key);
+    Ok(removed)
+}
+
+#[tauri::command(async)]
+pub fn remove_game(shared: SharedState, key: String) -> Result<(), String> {
+    forget_game(&shared, &key, false).map(|_| ())
+}
+
+#[tauri::command(async)]
+pub fn delete_game(shared: SharedState, key: String) -> Result<usize, String> {
+    forget_game(&shared, &key, true)
 }
 
 #[tauri::command]
@@ -345,6 +412,42 @@ pub async fn set_vote(
 ) -> Result<(), String> {
     let shared = Arc::clone(&shared);
     blocking(move || vndb_list::set_vote(&shared, &key, vote)).await
+}
+
+fn token_and_library(shared: &Shared) -> Result<(String, Vec<String>), String> {
+    let cfg = shared.config.lock().unwrap();
+    let ids: Vec<String> = cfg
+        .all_games()
+        .values()
+        .flat_map(|e| [text(e, "vndb_id"), text(e, "matched_vndb_id")])
+        .filter(|id| !id.is_empty())
+        .collect();
+    let token = cfg.str("vndb_token").trim().to_string();
+    if token.is_empty() {
+        return Err("add your VNDB token in Settings first".into());
+    }
+    Ok((token, ids))
+}
+
+#[tauri::command]
+pub async fn get_vndb_labels(shared: SharedState<'_>) -> Result<Value, String> {
+    let shared = Arc::clone(&shared);
+    blocking(move || {
+        let (token, _) = token_and_library(&shared)?;
+        Ok(json!({ "labels": shared.vndb.labels(&token)? }))
+    })
+    .await
+}
+
+#[tauri::command]
+pub async fn get_vndb_list(shared: SharedState<'_>, label: i64) -> Result<Value, String> {
+    let shared = Arc::clone(&shared);
+    blocking(move || {
+        let (token, in_library) = token_and_library(&shared)?;
+        let vns: Vec<VnResult> = shared.vndb.label_list(&token, label)?;
+        Ok(json!({ "vns": vns, "in_library": in_library }))
+    })
+    .await
 }
 
 #[tauri::command]

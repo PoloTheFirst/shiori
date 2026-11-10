@@ -13,4 +13,8 @@ tools/symbolize/Cargo.lock
 wrapped/
 RENAME.txt
 shiori/
+<<<<<<< HEAD
 vendor/
+=======
+video/
+>>>>>>> 222338486c012daff143b0bf4996fccb9d4c917d

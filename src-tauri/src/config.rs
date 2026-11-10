@@ -23,6 +23,7 @@ fn defaults() -> Map<String, Value> {
         "presence_language": "app",
         "library_view": "list",
         "library_sort": "most",
+        "library_sort_reverse": false,
         "screenshots_view": "right",
         "screenshots_order": "game",
         "background_image": "",
@@ -30,6 +31,9 @@ fn defaults() -> Map<String, Value> {
         "background_dim": 55,
         "background_panels": 80,
         "labs_compact_sidebar": false,
+        "labs_topbar": true,
+        "heatmap_starts": true,
+        "heatmap_flags": true,
         "reco_hidden": [],
         "reco_view": "details",
         "split_by_title": false,
@@ -61,6 +65,8 @@ fn defaults() -> Map<String, Value> {
         "mascot_click_hotkey": "",
         "mascot_chatter_minutes": 0,
         "mascot_voice_volume": 80,
+        "mascot_voice_volumes": {},
+        "mascot_balloons": {},
         "language": "auto",
         "mascot_height": 420,
         "mascot_talk": true,
@@ -596,6 +602,84 @@ impl Config {
         }
     }
 
+    pub fn files_of(&self, key: &str) -> Vec<PathBuf> {
+        let Some(entry) = self.games.get(key) else {
+            return vec![];
+        };
+        let text = |e: &Entry, field: &str| {
+            e.get(field)
+                .and_then(Value::as_str)
+                .unwrap_or("")
+                .to_string()
+        };
+        let others: Vec<&Entry> = self
+            .games
+            .iter()
+            .filter(|(k, _)| *k != key)
+            .map(|(_, e)| e)
+            .collect();
+        let shared_value =
+            |field: &str, value: &str| others.iter().any(|e| text(e, field) == value);
+        let shared_vn = |id: &str| {
+            others
+                .iter()
+                .any(|e| vn_of(e) == id || text(e, "cover_value") == id)
+        };
+
+        let mut stems = Vec::new();
+        let mut files = Vec::new();
+        let ids: Vec<String> = ["vndb_id", "matched_vndb_id"]
+            .iter()
+            .map(|field| text(entry, field))
+            .filter(|id| !id.is_empty() && !shared_vn(id))
+            .collect();
+        let vndb_cache = self.dir.join("cache").join("vndb");
+        for id in &ids {
+            stems.push(id.clone());
+            for prefix in ["id", "desc", "chars", "releases"] {
+                files.push(vndb_cache.join(format!("{prefix}_{id}.json")));
+            }
+        }
+
+        let (source, value) = (text(entry, "cover_source"), text(entry, "cover_value"));
+        if !value.is_empty() && !shared_value("cover_value", &value) {
+            match source.as_str() {
+                "url" => stems.push(url_cache_key(&value)),
+                "local" => files.push(PathBuf::from(&value)),
+                _ => {}
+            }
+        }
+
+        for file in fs::read_dir(self.covers_dir())
+            .into_iter()
+            .flatten()
+            .flatten()
+        {
+            let path = file.path();
+            let stem = path
+                .file_stem()
+                .map(|f| f.to_string_lossy().to_string())
+                .unwrap_or_default();
+            if path.is_file() && stems.contains(&stem) {
+                files.push(path);
+            }
+        }
+
+        let root = self.dir.canonicalize().unwrap_or_else(|_| self.dir.clone());
+        let mut out: Vec<PathBuf> = files
+            .into_iter()
+            .filter(|path| path.is_file())
+            .filter(|path| {
+                path.canonicalize()
+                    .map(|p| p.starts_with(&root))
+                    .unwrap_or(false)
+            })
+            .collect();
+        out.sort();
+        out.dedup();
+        out
+    }
+
     pub fn duplicates_of(&self, key: &str) -> Vec<String> {
         let Some(entry) = self.games.get(key) else {
             return vec![];
@@ -775,6 +859,67 @@ mod tests {
 
     fn add(cfg: &mut Config, key: &str, fields: Value) {
         cfg.set_game(key, fields.as_object().cloned().unwrap_or_default());
+    }
+
+    #[test]
+    fn files_of_a_game_skip_what_others_still_use_and_stay_in_the_data_folder() {
+        let mut cfg = library("files-of");
+        let covers = cfg.covers_dir();
+        let vndb = cfg.dir.join("cache").join("vndb");
+        fs::create_dir_all(covers.join("local")).unwrap();
+        fs::create_dir_all(&vndb).unwrap();
+        let url = "https://t.vndb.org/cv/1/1.jpg";
+        let custom = covers.join("local").join("mine.png");
+        let outside =
+            std::env::temp_dir().join(format!("vnrpc-outside-{}.png", std::process::id()));
+        for file in [
+            covers.join("v1.jpg"),
+            covers.join(format!("{}.jpg", url_cache_key(url))),
+            covers.join("v2.jpg"),
+            vndb.join("id_v1.json"),
+            vndb.join("desc_v1.json"),
+            vndb.join("id_v2.json"),
+            custom.clone(),
+            outside.clone(),
+        ] {
+            fs::write(file, "x").unwrap();
+        }
+        add(
+            &mut cfg,
+            "a",
+            json!({ "vndb_id": "v1", "cover_source": "url", "cover_value": url }),
+        );
+        add(
+            &mut cfg,
+            "b",
+            json!({ "vndb_id": "v2", "cover_source": "local", "cover_value": custom.to_string_lossy() }),
+        );
+        add(&mut cfg, "c", json!({ "matched_vndb_id": "v2" }));
+        add(
+            &mut cfg,
+            "d",
+            json!({ "cover_source": "local", "cover_value": outside.to_string_lossy() }),
+        );
+
+        let names = |key: &str| -> Vec<String> {
+            cfg.files_of(key)
+                .iter()
+                .map(|p| p.file_name().unwrap().to_string_lossy().to_string())
+                .collect()
+        };
+        let mut a = names("a");
+        a.sort();
+        let mut expected = vec![
+            "desc_v1.json".to_string(),
+            "id_v1.json".into(),
+            "v1.jpg".into(),
+            format!("{}.jpg", url_cache_key(url)),
+        ];
+        expected.sort();
+        assert_eq!(a, expected);
+        assert_eq!(names("b"), vec!["mine.png".to_string()]);
+        assert!(names("d").is_empty());
+        let _ = fs::remove_file(outside);
     }
 
     #[test]

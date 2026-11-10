@@ -16,6 +16,7 @@ pub struct Lines {
     pub screenshot: String,
     pub pokes: Vec<String>,
     pub chatter: Vec<String>,
+    pub reading: Vec<String>,
 }
 
 fn personality(id: &str, language: &str) -> &'static Value {
@@ -51,6 +52,7 @@ pub fn lines(id: &str, language: &str) -> Lines {
         screenshot: text("screenshot"),
         pokes: list("pokes"),
         chatter: list("chatter"),
+        reading: list("reading"),
     }
 }
 
@@ -68,7 +70,11 @@ pub fn custom(mut base: Lines, own: &Value) -> Lines {
             *line = own;
         }
     }
-    for (key, lines) in [("pokes", &mut base.pokes), ("chatter", &mut base.chatter)] {
+    for (key, lines) in [
+        ("pokes", &mut base.pokes),
+        ("chatter", &mut base.chatter),
+        ("reading", &mut base.reading),
+    ] {
         let own: Vec<String> = own[key]
             .as_array()
             .into_iter()
@@ -123,6 +129,8 @@ mod tests {
                 assert!(lines.section.contains("{section}"), "{code} {} section", choice.id);
                 assert_eq!(lines.pokes.len(), 3, "{code} {} pokes", choice.id);
                 assert_eq!(lines.chatter.len(), 3, "{code} {} chatter", choice.id);
+                assert_eq!(lines.reading.len(), 3, "{code} {} reading", choice.id);
+                assert!(lines.reading.iter().all(|l| l.contains("{name}") || l.contains("{total}") || l.contains("{session}")));
                 for line in [&lines.stop, &lines.idle, &lines.back, &lines.screenshot] {
                     assert!(!line.is_empty(), "{code} {}", choice.id);
                 }

@@ -40,6 +40,11 @@
         "まだ読んでるの？えらいえらい～",
         "お水飲むの忘れないでね！",
         "この先どうなるのかな…続けて続けて！"
+      ],
+      "reading": [
+        "{name}、もう{total}だね！いい調子～",
+        "今回は{session}読んでるよ。そろそろ少し休憩する？",
+        "{name}どう？続きが気になる！"
       ]
     },
     "tsundere": {
@@ -59,6 +64,11 @@
         "ちょ、ちょっと、もうずいぶん読んでるじゃない。別に心配してるわけじゃないけど！",
         "夜更かししすぎないでよね、バカ。",
         "…まあ、このシーンは悪くないわね。"
+      ],
+      "reading": [
+        "{name}で{total}…べ、別にあんたのために数えてるんじゃないんだからね！",
+        "もう{session}読んでるじゃない。目を悪くするわよ、バカ。",
+        "ふん、また{name}？…まあ、いい作品よね。"
       ]
     },
     "shy": {
@@ -78,6 +88,11 @@
         "あ、あの…まだここで、一緒に読んでます…",
         "す、少しストレッチとか…？よ、よければ…",
         "なんだか落ち着きます…一緒に読むの…"
+      ],
+      "reading": [
+        "あ、あの…{name}、もう{total}です…",
+        "もう{session}…す、少しストレッチしませんか？",
+        "{name}がやさしいお話だといいな…"
       ]
     },
     "big_sister": {
@@ -97,6 +112,11 @@
         "ずいぶん頑張ってるわね。えらいわ～",
         "目を休めるのも忘れないでね？",
         "あらあら～、集中しちゃって。かわいい。"
+      ],
+      "reading": [
+        "{name}で{total}かぁ。えらいね。",
+        "{session}続けて読んでるよ。少し目を休めようね？",
+        "{name}でもう泣いちゃった？お姉ちゃんがついてるよ。"
       ]
     },
     "chuuni": {
@@ -116,10 +136,19 @@
         "物語は深淵へ…大いなる運命を感じるぞ！",
         "人の子よ、その持久力…我すら感服するわ！",
         "我が魔眼は汝と共に一行一行を見届けている…"
+      ],
+      "reading": [
+        "禁断の書『{name}』に捧げし{total}…見事だ。",
+        "汝の魂は{session}もの間、文字に囚われている！",
+        "『{name}』の予言が紐解かれていく…読み進めよ、我が器よ！"
       ]
     }
   },
   "ui": {
+    "Finished: {names}": "読了：{names}",
+    "Started: {names}": "読み始め：{names}",
+    "started a VN": "読み始めたVN",
+    "finished a VN": "読了したVN",
     "“Total read: …”": "「合計読書時間：…」",
     "“Today: …”": "「今日：…」",
     "Share your mascots": "マスコットを共有しよう",
@@ -334,6 +363,20 @@
     "Most read": "読書時間順",
     "Recent": "最近",
     "A–Z": "A–Z",
+    "Delete…": "削除…",
+    "Delete {name}?": "{name} を削除しますか？",
+    "This removes from Shiori:": "Shiori から次を削除します：",
+    "its time read, history and status": "読書時間、履歴、ステータス",
+    "its covers and VNDB info saved on this PC": "このPCに保存されたカバーとVNDB情報",
+    "Screenshots are kept. If you start it again, it comes back as a new VN.": "スクリーンショットは残ります。また起動すると、新しいVNとして追加されます。",
+    "{name} was deleted (its screenshots are kept)": "{name} を削除しました（スクリーンショットは残っています）",
+    "Idle": "放置中",
+    "Top bar": "トップバー",
+    "Shows the VN you're reading, the search, the status and Pause at the top.": "読んでいるVN、検索、ステータス、一時停止を上部に表示します。",
+    "Release date": "発売日",
+    "Reverse order": "並び順を反転",
+    "Shelves by year": "発売年ごとの棚",
+    "Unknown year": "発売年不明",
     "Random from wishlist": "ウィッシュリストからランダム",
     "All statuses": "すべてのステータス",
     "Playing": "プレイ中",
@@ -660,6 +703,35 @@
     "Clicks go through it.": "クリックが通り抜けます。",
     "Voices…": "ボイス…",
     "Add a sound…": "音声を追加…",
+    "Drag the bubble to choose where it shows up next to the mascot.": "吹き出しをドラッグして、マスコットのどこに表示するか選べます。",
+    "Put it back automatically": "自動で配置",
+    "Bubble…": "吹き出し…",
+    "{name}'s bubble": "{name}の吹き出し",
+    "Hi! This is how I'll talk to you while you read.": "こんにちは！読んでいる間、こんなふうに話しかけるね。",
+    "Style": "スタイル",
+    "Border": "枠線",
+    "Border width": "枠線の太さ",
+    "Roundness": "角の丸み",
+    "Text size": "文字サイズ",
+    "Font": "フォント",
+    "App font": "アプリのフォント",
+    "Rounded": "丸ゴシック",
+    "Serif": "明朝",
+    "Monospace": "等幅",
+    "Handwritten": "手書き",
+    "Tail": "しっぽ",
+    "Points at the mascot.": "マスコットを指します。",
+    "Shadow": "影",
+    "Bold text": "太字",
+    "Reset": "リセット",
+    "Paper": "紙",
+    "Night": "夜",
+    "Sakura": "桜",
+    "Comic": "コミック",
+    "Mint": "ミント",
+    "Minimal": "ミニマル",
+    "Novel": "ノベル",
+    "This mascot's volume": "このマスコットの音量",
     "Choose a sound": "音声を選択",
     "No sound: it only shows the text.": "音声なし：テキストだけ表示されます。",
     "{name}'s voice": "{name}のボイス",
@@ -801,6 +873,32 @@
     "Even the ones that aren't on this PC. New ones are added each time the app starts, and a VN you remove from the Library stays out.": "このPCにないものも含みます。新しいものはアプリ起動時に追加され、ライブラリから削除したVNは戻りません。",
     "Added {vns} from your VNDB list": "VNDBリストから{vns}を追加しました",
     "Nothing new on your VNDB list": "VNDBリストに新しいものはありません",
-    "From your VNDB list": "VNDBリストから"
+    "From your VNDB list": "VNDBリストから",
+    "About the VN you're reading": "読んでいるVNについて",
+    "{name}: the VN · {total}: time on it · {session}: this session.": "{name}：VN名 · {total}：そのVNの時間 · {session}：今回のセッション",
+    "Animation": "アニメーション",
+    "Replay": "もう一度",
+    "Pop": "ポップ",
+    "Fade": "フェード",
+    "Bounce": "バウンド",
+    "Slide": "スライド",
+    "Letter by letter": "一文字ずつ",
+    "My VNDB lists": "VNDBのリスト",
+    "Random pick": "ランダムに選ぶ",
+    "Hide VNs already in my Library": "ライブラリにあるVNを隠す",
+    "Private list": "非公開リスト",
+    "Loading your lists…": "リストを読み込み中…",
+    "In your Library": "ライブラリにあり",
+    "{count} VNs": "{count}本のVN",
+    "This list is empty on VNDB.": "VNDBのこのリストは空です。",
+    "Add your VNDB token in Settings to see your lists.": "リストを見るには設定でVNDBトークンを追加してください。",
+    "Open Settings": "設定を開く",
+    "Loading…": "読み込み中…",
+    "← My VNDB lists": "← VNDBのリスト",
+    "Random pick from your VNDB list “{name}”": "VNDBのリスト「{name}」からランダムに選びました",
+    "Wishlist": "ウィッシュリスト",
+    "Voted": "投票済み",
+    "Blacklist": "ブラックリスト",
+    "{position} / {count} in this list": "このリストの{position} / {count}"
   }
 }

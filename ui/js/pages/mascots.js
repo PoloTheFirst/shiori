@@ -6,6 +6,13 @@ import { call, confirmButton, openDialog, toast, toggle } from "../ui.js";
 import { t } from "../i18n.js";
 import { hotkeyInput } from "../components/hotkey-input.js";
 import { discordButton } from "../components/discord-button.js";
+import {
+  applyBalloon,
+  BALLOON_DEFAULT,
+  BALLOON_PRESETS,
+  balloonStyle,
+  playBalloon,
+} from "../balloon-style.js";
 
 const TEMPLATE = `
   <div class="page-head">
@@ -53,6 +60,7 @@ const LINE_FIELDS = [
 const LIST_FIELDS = [
   ["pokes", "When you click it"],
   ["chatter", "Now and then"],
+  ["reading", "About the VN you're reading", "{name}: the VN · {total}: time on it · {session}: this session."],
 ];
 
 const VOICE_MOMENTS = [
@@ -243,6 +251,12 @@ function card(item, personalities) {
     editVoices(item);
   };
 
+  const bubble = el("button", { class: "btn secondary small" }, "Bubble…");
+  bubble.onclick = (event) => {
+    event.stopPropagation();
+    editBalloon(item);
+  };
+
   const rename = el("button", { class: "mascot-rename", title: "Rename" }, "✎");
   rename.onclick = (event) => {
     event.stopPropagation();
@@ -282,6 +296,7 @@ function card(item, personalities) {
         personality,
         editLines,
         voices,
+        bubble,
       ),
       el("div", { class: "mascot-size" }, viewOnly),
       el("div", { class: "row" }, share, remove),
@@ -304,7 +319,7 @@ async function writeLines(item) {
       hint && el("span", { class: "small-text muted" }, hint),
     );
   });
-  const lists = LIST_FIELDS.map(([key, label]) => {
+  const lists = LIST_FIELDS.map(([key, label, hint]) => {
     inputs[key] = el("textarea", { rows: 4, placeholder: (defaults[key] || []).join("\n") });
     inputs[key].value = (saved[key] || []).join("\n");
     return el(
@@ -313,6 +328,7 @@ async function writeLines(item) {
       el("span", {}, label),
       inputs[key],
       el("span", { class: "small-text muted" }, "One per line, picked at random."),
+      hint && el("span", { class: "small-text muted" }, hint),
     );
   });
 
@@ -355,23 +371,45 @@ async function writeLines(item) {
 
 const fileName = (path) => path.split(/[\\/]/).pop();
 
+const mascotVolume = (id) => store.settings.mascot_voice_volumes?.[id] ?? 100;
+
 let preview = null;
-function playPreview(path) {
+function playPreview(path, id) {
   preview?.pause();
   preview = new Audio(fileUrl(path));
-  preview.volume = (store.settings.mascot_voice_volume ?? 80) / 100;
+  preview.volume = ((store.settings.mascot_voice_volume ?? 80) / 100) * (mascotVolume(id) / 100);
   preview.play().catch(() => {});
+}
+
+function voiceVolume(item) {
+  const range = el("input", { type: "range", min: 0, max: 100, step: 5, value: mascotVolume(item.id) });
+  const label = el("span", { class: "muted", style: { width: "44px", textAlign: "right" } });
+  const show = () => (label.textContent = Number(range.value) ? `${range.value}%` : t("Off"));
+  range.oninput = show;
+  range.onchange = async () => {
+    const volumes = { ...(store.settings.mascot_voice_volumes || {}), [item.id]: Number(range.value) };
+    store.settings.mascot_voice_volumes = volumes;
+    await call("update_settings", { changes: { mascot_voice_volumes: volumes } });
+  };
+  show();
+  return el(
+    "div",
+    { class: "field" },
+    el("span", {}, "This mascot's volume"),
+    el("div", { class: "row" }, range, label),
+  );
 }
 
 async function editVoices(item) {
   const body = el("div", { class: "line-fields" });
+  const volume = voiceVolume(item);
 
   const render = async () => {
     const voices = await call("mascot_voices", { id: item.id });
     const rows = VOICE_MOMENTS.map(([moment, label]) => {
       const files = (voices[moment] || []).map((path) => {
         const play = el("button", { class: "btn secondary small", title: "Play" }, "▶");
-        play.onclick = () => playPreview(path);
+        play.onclick = () => playPreview(path, item.id);
         const remove = el("button", { class: "btn danger small", title: "Remove" }, "✕");
         remove.onclick = async () => {
           await call("remove_mascot_voice", { path });
@@ -406,6 +444,7 @@ async function editVoices(item) {
           "with the lines in order: the 1st sound (by file name) with the 1st line, and so on. " +
           "Elsewhere, one is picked at random.",
       ),
+      volume,
       ...rows,
     );
   };
@@ -418,6 +457,281 @@ async function editVoices(item) {
     actions: [{ label: "Done", value: true }],
   });
   preview?.pause();
+}
+
+const BALLOON_ANIM_NAMES = [
+  ["pop", "Pop"],
+  ["fade", "Fade"],
+  ["bounce", "Bounce"],
+  ["slide", "Slide"],
+  ["type", "Letter by letter"],
+];
+
+const BALLOON_FONT_NAMES = [
+  ["app", "App font"],
+  ["rounded", "Rounded"],
+  ["serif", "Serif"],
+  ["mono", "Monospace"],
+  ["hand", "Handwritten"],
+];
+
+function hexOf(color) {
+  const ctx = document.createElement("canvas").getContext("2d");
+  ctx.fillStyle = "#000000";
+  ctx.fillStyle = color.trim() || "#000000";
+  const value = ctx.fillStyle;
+  if (value.startsWith("#")) {
+    return value;
+  }
+  const [r, g, b] = value.match(/\d+/g).map(Number);
+  return `#${[r, g, b].map((n) => n.toString(16).padStart(2, "0")).join("")}`;
+}
+
+function themeColor(name) {
+  return hexOf(getComputedStyle(document.documentElement).getPropertyValue(name));
+}
+
+function sameStyle(a, b, keys = Object.keys(BALLOON_DEFAULT)) {
+  return keys.every((key) => JSON.stringify(a[key] ?? null) === JSON.stringify(b[key] ?? null));
+}
+
+const LOOK_KEYS = Object.keys(BALLOON_DEFAULT).filter((key) => !["pos", "size", "anim"].includes(key));
+
+function pictureBox(img, stage) {
+  const box = img.getBoundingClientRect();
+  const frame = stage.getBoundingClientRect();
+  const ratio = img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : box.width / box.height;
+  let width = box.width;
+  let height = box.height;
+  if (width / height > ratio) {
+    width = height * ratio;
+  } else {
+    height = width / ratio;
+  }
+  return {
+    left: box.left - frame.left + (box.width - width) / 2,
+    top: box.top - frame.top + (box.height - height) / 2,
+    width,
+    height,
+  };
+}
+
+function draggableBubble(bubble, picture, stage, getPos, setPos) {
+  const place = () => {
+    const pic = pictureBox(picture, stage);
+    const w = bubble.offsetWidth;
+    const h = bubble.offsetHeight;
+    const pos = getPos();
+    let x;
+    let y;
+    let toRight;
+    if (pos) {
+      x = pic.left + pos[0] * pic.width - w / 2;
+      y = pic.top + pos[1] * pic.height - h / 2;
+      toRight = pos[0] < 0.5;
+    } else {
+      x = pic.left - w + pic.width / 6;
+      toRight = x >= 0;
+      if (!toRight) {
+        x = pic.left + pic.width - pic.width / 6;
+      }
+      y = pic.top + pic.height / 10;
+    }
+    x = Math.max(0, Math.min(x, stage.clientWidth - w));
+    y = Math.max(0, Math.min(y, stage.clientHeight - h));
+    bubble.style.left = `${x}px`;
+    bubble.style.top = `${y}px`;
+    bubble.classList.toggle("to-right", toRight);
+  };
+
+  bubble.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    bubble.setPointerCapture(event.pointerId);
+    bubble.classList.add("dragging");
+    const startX = event.clientX - bubble.offsetLeft;
+    const startY = event.clientY - bubble.offsetTop;
+    const move = (e) => {
+      const pic = pictureBox(picture, stage);
+      const x = Math.max(0, Math.min(e.clientX - startX, stage.clientWidth - bubble.offsetWidth));
+      const y = Math.max(0, Math.min(e.clientY - startY, stage.clientHeight - bubble.offsetHeight));
+      const cx = (x + bubble.offsetWidth / 2 - pic.left) / pic.width;
+      const cy = (y + bubble.offsetHeight / 2 - pic.top) / pic.height;
+      setPos([Math.round(cx * 1000) / 1000, Math.round(cy * 1000) / 1000]);
+      place();
+    };
+    const up = () => {
+      bubble.classList.remove("dragging");
+      bubble.removeEventListener("pointermove", move);
+      bubble.removeEventListener("pointerup", up);
+      bubble.removeEventListener("pointercancel", up);
+    };
+    bubble.addEventListener("pointermove", move);
+    bubble.addEventListener("pointerup", up);
+    bubble.addEventListener("pointercancel", up);
+  });
+
+  picture.addEventListener("load", place);
+  new ResizeObserver(place).observe(bubble);
+  return place;
+}
+
+async function editBalloon(item) {
+  let draft = balloonStyle(store.settings, item.id);
+
+  const sampleText = t("Hi! This is how I'll talk to you while you read.");
+  const words = el("span", { class: "balloon-text" }, sampleText);
+  const bubble = el("div", { class: "balloon to-right" }, words);
+  const replay = () => playBalloon(bubble, words, sampleText, draft);
+  const picture = el("img", {
+    src: item.built_in ? "assets/mascot.png" : fileUrl(item.file),
+    alt: "",
+    draggable: "false",
+  });
+  const stage = el("div", { class: "balloon-stage" }, picture, bubble);
+  const controls = el("div", { class: "balloon-controls" });
+  const autoPlace = el("button", { class: "btn secondary small" }, "Put it back automatically");
+  const placeBubble = draggableBubble(
+    bubble,
+    picture,
+    stage,
+    () => draft.pos,
+    (pos) => {
+      draft.pos = pos;
+      autoPlace.disabled = false;
+    },
+  );
+  autoPlace.disabled = !draft.pos;
+  autoPlace.onclick = () => {
+    draft.pos = null;
+    autoPlace.disabled = true;
+    placeBubble();
+  };
+
+  const update = (changes) => {
+    draft = { ...draft, ...changes };
+    applyBalloon(bubble, draft);
+    placeBubble();
+  };
+
+  const colorInput = (key, label, fallback) => {
+    const input = el("input", { type: "color", value: draft[key] || themeColor(fallback) });
+    input.oninput = () => update({ [key]: input.value });
+    return el("label", {}, input, label);
+  };
+
+  const range = (key, label, min, max, unit = "px") => {
+    const input = el("input", { type: "range", min, max, step: 1, value: draft[key] });
+    const shown = el("span", { class: "muted" });
+    const show = () => (shown.textContent = `${input.value}${unit}`);
+    input.oninput = () => {
+      show();
+      update({ [key]: Number(input.value) });
+    };
+    show();
+    return el("div", { class: "field" }, el("span", {}, label), el("div", { class: "row" }, input, shown));
+  };
+
+  const render = () => {
+    applyBalloon(bubble, draft);
+    requestAnimationFrame(placeBubble);
+    const presets = el(
+      "div",
+      { class: "balloon-presets" },
+      ...BALLOON_PRESETS.map(([name, preset]) => {
+        const style = { ...BALLOON_DEFAULT, ...preset };
+        const sample = el("span", { class: "balloon" }, el("span", { class: "balloon-text" }, "Aa"));
+        applyBalloon(sample, { ...style, tail: false, shadow: false, size: 12 });
+        const button = el(
+          "button",
+          { class: `balloon-preset ${sameStyle(style, draft, LOOK_KEYS) ? "on" : ""}`, title: name },
+          sample,
+          el("span", { class: "small-text" }, name),
+        );
+        button.onclick = () => {
+          draft = { ...style, size: draft.size, pos: draft.pos, anim: draft.anim };
+          render();
+        };
+        return button;
+      }),
+    );
+
+    const font = el(
+      "select",
+      {},
+      ...BALLOON_FONT_NAMES.map(([value, label]) =>
+        el("option", { value, selected: value === draft.font }, t(label)),
+      ),
+    );
+    font.onchange = () => update({ font: font.value });
+
+    const anim = el(
+      "select",
+      {},
+      ...BALLOON_ANIM_NAMES.map(([value, label]) =>
+        el("option", { value, selected: value === draft.anim }, t(label)),
+      ),
+    );
+    anim.onchange = () => {
+      update({ anim: anim.value });
+      replay();
+    };
+    const again = el("button", { class: "btn secondary small", title: "Replay" }, "▶");
+    again.onclick = replay;
+
+    controls.replaceChildren(
+      el("div", { class: "field-label" }, "Style"),
+      presets,
+      el(
+        "div",
+        { class: "custom-colors" },
+        colorInput("bg", "Background", "--surface"),
+        colorInput("border", "Border", "--accent"),
+        colorInput("text", "Text", "--text"),
+      ),
+      range("width", "Border width", 0, 6),
+      range("radius", "Roundness", 0, 30),
+      range("size", "Text size", 11, 20),
+      el("div", { class: "field" }, el("span", {}, "Font"), font),
+      el("div", { class: "field" }, el("span", {}, "Animation"), el("div", { class: "row" }, again, anim)),
+      toggle("Tail", draft.tail, (on) => update({ tail: on }), "Points at the mascot."),
+      toggle("Shadow", draft.shadow, (on) => update({ shadow: on })),
+      toggle("Bold text", draft.bold, (on) => update({ bold: on })),
+    );
+  };
+  render();
+
+  const answer = await openDialog({
+    title: t("{name}'s bubble", { name: t(item.name) }),
+    width: 1000,
+    body: el(
+      "div",
+      { class: "balloon-editor" },
+      el(
+        "div",
+        { class: "balloon-left" },
+        stage,
+        el("div", { class: "hint-text" }, "Drag the bubble to choose where it shows up next to the mascot."),
+        autoPlace,
+      ),
+      controls,
+    ),
+    actions: [
+      { label: "Reset", kind: "secondary", value: "reset" },
+      { label: "Cancel", kind: "secondary", value: null },
+      { label: "Save", value: "save" },
+    ],
+  });
+  if (!answer) {
+    return;
+  }
+  const balloons = { ...(store.settings.mascot_balloons || {}) };
+  if (answer === "reset" || sameStyle(draft, BALLOON_DEFAULT)) {
+    delete balloons[item.id];
+  } else {
+    balloons[item.id] = draft;
+  }
+  store.settings.mascot_balloons = balloons;
+  await call("update_settings", { changes: { mascot_balloons: balloons } });
 }
 
 async function renameMascot(item) {

@@ -654,6 +654,11 @@ button.chip:hover,
   justify-content: flex-start;
 }
 
+.lang-menu.right {
+  left: auto;
+  right: 0;
+}
+
 .lang-menu button.on::after {
   margin-left: auto;
 }
@@ -807,4 +812,10 @@ button.chip:hover,
   gap: 6px;
   justify-items: start;
   min-width: 0;
+}
+
+.delete-list ul {
+  margin: 0 0 10px;
+  padding-left: 20px;
+  line-height: 1.7;
 }

@@ -40,6 +40,11 @@
         "¿Sigues leyendo? ¡Lo haces genial~!",
         "¡No olvides tomar algo de agua!",
         "Me pregunto qué pasará... ¡sigue!"
+      ],
+      "reading": [
+        "¡Ya llevas {total} en {name}! ¡Vas genial~!",
+        "{session} leyendo seguido. ¿Un descansito pronto?",
+        "¿Qué tal va {name}? ¡Quiero saber qué pasa después!"
       ]
     },
     "tsundere": {
@@ -59,6 +64,11 @@
         "O-oye, llevas un buen rato leyendo. ¡No es que me preocupe!",
         "No te acuestes muy tarde, tonto.",
         "...Vale, esta parte está bastante bien."
+      ],
+      "reading": [
+        "{total} en {name}... ¡N-no es que lo cuente por ti!",
+        "Llevas {session} leyendo. No te dañes la vista, tonto.",
+        "Hmph, ¿{name} otra vez? ...Vale, es bueno."
       ]
     },
     "shy": {
@@ -78,6 +88,11 @@
         "E-eh... sigo aquí, leyendo contigo...",
         "¿Q-quizás estirarte un poco? ...Solo si quieres...",
         "Qué bonito... leer juntos..."
+      ],
+      "reading": [
+        "E-esto... ya son {total} en {name}...",
+        "Ya {session}... ¿q-quizás estirarte un poco?",
+        "Espero que {name} te esté tratando bien..."
       ]
     },
     "big_sister": {
@@ -97,6 +112,11 @@
         "Llevas un buen rato, cariño. Estoy orgullosa de ti~",
         "Acuérdate de descansar la vista, ¿vale?",
         "Ara~ Qué concentrado. Qué mono."
+      ],
+      "reading": [
+        "{total} en {name}, ¿eh? Estoy orgullosa de ti.",
+        "Llevas {session} seguidas. Descansa la vista un minuto, ¿vale?",
+        "¿{name} ya te hizo llorar? Tu hermana mayor está aquí."
       ]
     },
     "chuuni": {
@@ -116,10 +136,19 @@
         "La historia se oscurece... ¡presiento un gran destino!",
         "¡Mortal, tu resistencia me impresiona!",
         "Mi ojo oscuro sigue cada línea contigo..."
+      ],
+      "reading": [
+        "{total} entregadas al tomo prohibido {name}... impresionante.",
+        "¡Tu alma lleva {session} atada al texto!",
+        "La profecía de {name} se revela... ¡sigue leyendo, mi elegido!"
       ]
     }
   },
   "ui": {
+    "Finished: {names}": "Terminado: {names}",
+    "Started: {names}": "Empezado: {names}",
+    "started a VN": "VN empezada",
+    "finished a VN": "VN terminada",
     "“Total read: …”": "«Tiempo leído: …»",
     "“Today: …”": "«Hoy: …»",
     "Share your mascots": "Comparte tus mascotas",
@@ -334,6 +363,20 @@
     "Most read": "Más leídas",
     "Recent": "Recientes",
     "A–Z": "A–Z",
+    "Delete…": "Eliminar…",
+    "Delete {name}?": "¿Eliminar {name}?",
+    "This removes from Shiori:": "Esto borra de Shiori:",
+    "its time read, history and status": "su tiempo de lectura, su historial y su estado",
+    "its covers and VNDB info saved on this PC": "sus portadas y la info de VNDB guardadas en este PC",
+    "Screenshots are kept. If you start it again, it comes back as a new VN.": "Las capturas se conservan. Si lo vuelves a abrir, vuelve como una VN nueva.",
+    "{name} was deleted (its screenshots are kept)": "{name} se eliminó (sus capturas se conservan)",
+    "Idle": "Inactivo",
+    "Top bar": "Barra superior",
+    "Shows the VN you're reading, the search, the status and Pause at the top.": "Muestra arriba la VN que lees, la búsqueda, el estado y Pausa.",
+    "Release date": "Fecha de lanzamiento",
+    "Reverse order": "Invertir orden",
+    "Shelves by year": "Estantes por año",
+    "Unknown year": "Año desconocido",
     "Random from wishlist": "Al azar de la wishlist",
     "All statuses": "Todos los estados",
     "Playing": "Leyendo",
@@ -659,6 +702,35 @@
     "Clicks go through it.": "Los clics la atraviesan.",
     "Voices…": "Voces…",
     "Add a sound…": "Añadir un sonido…",
+    "Drag the bubble to choose where it shows up next to the mascot.": "Arrastra la burbuja para elegir dónde aparece junto a la mascota.",
+    "Put it back automatically": "Colocar automáticamente",
+    "Bubble…": "Burbuja…",
+    "{name}'s bubble": "Burbuja de {name}",
+    "Hi! This is how I'll talk to you while you read.": "¡Hola! Así te hablaré mientras lees.",
+    "Style": "Estilo",
+    "Border": "Borde",
+    "Border width": "Grosor del borde",
+    "Roundness": "Redondeo",
+    "Text size": "Tamaño del texto",
+    "Font": "Fuente",
+    "App font": "Fuente de la app",
+    "Rounded": "Redondeada",
+    "Serif": "Serif",
+    "Monospace": "Monoespaciada",
+    "Handwritten": "Manuscrita",
+    "Tail": "Pico",
+    "Points at the mascot.": "Apunta a la mascota.",
+    "Shadow": "Sombra",
+    "Bold text": "Texto en negrita",
+    "Reset": "Restablecer",
+    "Paper": "Papel",
+    "Night": "Noche",
+    "Sakura": "Sakura",
+    "Comic": "Cómic",
+    "Mint": "Menta",
+    "Minimal": "Minimalista",
+    "Novel": "Novela",
+    "This mascot's volume": "Volumen de esta mascota",
     "Choose a sound": "Elegir un sonido",
     "No sound: it only shows the text.": "Sin sonido: solo se muestra el texto.",
     "{name}'s voice": "Voz de {name}",
@@ -800,6 +872,32 @@
     "Even the ones that aren't on this PC. New ones are added each time the app starts, and a VN you remove from the Library stays out.": "Incluso las que no están en este PC. Las nuevas se añaden cada vez que se abre la app, y una VN que quitas de la biblioteca no vuelve.",
     "Added {vns} from your VNDB list": "{vns} añadidas desde tu lista de VNDB",
     "Nothing new on your VNDB list": "Nada nuevo en tu lista de VNDB",
-    "From your VNDB list": "Desde tu lista de VNDB"
+    "From your VNDB list": "Desde tu lista de VNDB",
+    "About the VN you're reading": "Sobre la VN que estás leyendo",
+    "{name}: the VN · {total}: time on it · {session}: this session.": "{name}: la VN · {total}: tiempo en ella · {session}: esta sesión.",
+    "Animation": "Animación",
+    "Replay": "Repetir",
+    "Pop": "Pop",
+    "Fade": "Fundido",
+    "Bounce": "Rebote",
+    "Slide": "Deslizar",
+    "Letter by letter": "Letra por letra",
+    "My VNDB lists": "Mis listas de VNDB",
+    "Random pick": "Al azar",
+    "Hide VNs already in my Library": "Ocultar las VN que ya están en mi biblioteca",
+    "Private list": "Lista privada",
+    "Loading your lists…": "Cargando tus listas…",
+    "In your Library": "En tu biblioteca",
+    "{count} VNs": "{count} VN",
+    "This list is empty on VNDB.": "Esta lista está vacía en VNDB.",
+    "Add your VNDB token in Settings to see your lists.": "Añade tu token de VNDB en Ajustes para ver tus listas.",
+    "Open Settings": "Abrir Ajustes",
+    "Loading…": "Cargando…",
+    "← My VNDB lists": "← Mis listas de VNDB",
+    "Random pick from your VNDB list “{name}”": "Elegida al azar de tu lista de VNDB «{name}»",
+    "Wishlist": "Lista de deseos",
+    "Voted": "Votadas",
+    "Blacklist": "Lista negra",
+    "{position} / {count} in this list": "{position} / {count} en esta lista"
   }
 }

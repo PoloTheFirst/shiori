@@ -261,6 +261,25 @@ impl Vndb {
         Ok(Some(VnResult::from_api(&first)))
     }
 
+    pub fn release_dates(&self, ids: &[String]) -> Result<Vec<(String, String)>, String> {
+        let mut out = Vec::new();
+        for chunk in ids.chunks(100) {
+            let mut filters = vec![json!("or")];
+            filters.extend(chunk.iter().map(|id| json!(["id", "=", vn_id(id)])));
+            let filters = if chunk.len() == 1 {
+                filters[1].clone()
+            } else {
+                Value::Array(filters)
+            };
+            let body = json!({"filters": filters, "fields": "released", "results": 100});
+            let data = self.post("/vn", &body)?;
+            for vn in data["results"].as_array().into_iter().flatten() {
+                out.push((text(&vn["id"]), text(&vn["released"])));
+            }
+        }
+        Ok(out)
+    }
+
     pub fn description(&self, id: &str) -> Result<String, String> {
         let id = vn_id(id);
         let cache = self.cache_dir.join(format!("desc_{id}.json"));
@@ -438,8 +457,32 @@ impl Vndb {
     }
 
     pub fn wishlist(&self, token: &str) -> Result<Vec<VnResult>, String> {
-        let list = self.labelled(token, WISHLIST_LABEL, "")?;
+        self.label_list(token, WISHLIST_LABEL)
+    }
+
+    pub fn label_list(&self, token: &str, label: i64) -> Result<Vec<VnResult>, String> {
+        let list = self.labelled(token, label, "")?;
         Ok(list.into_iter().map(|(vn, _)| vn).collect())
+    }
+
+    pub fn labels(&self, token: &str) -> Result<Vec<Value>, String> {
+        let user = self.token_user(token)?;
+        let endpoint = format!("/ulist_labels?user={}&fields=count", text(&user["id"]));
+        let data = self.request(Method::GET, &endpoint, None, token)?;
+        Ok(data["labels"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter(|label| label["id"].as_i64().is_some())
+            .map(|label| {
+                json!({
+                    "id": label["id"],
+                    "label": text(&label["label"]),
+                    "private": label["private"].as_bool().unwrap_or(false),
+                    "count": label["count"].as_i64().unwrap_or(0),
+                })
+            })
+            .collect())
     }
 
     pub fn finished_list(&self, token: &str) -> Result<Vec<(VnResult, Value)>, String> {

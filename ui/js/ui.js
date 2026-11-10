@@ -97,10 +97,14 @@ export function openDialog({
   body = null,
   actions = [{ label: "OK", value: true }],
   wide = false,
+  width = null,
   onOpen = null,
 }) {
   return new Promise((resolve) => {
-    const dialog = el("dialog", { style: wide ? { width: "min(760px, 92vw)" } : {} });
+    const size = width || (wide ? 760 : null);
+    const dialog = el("dialog", {
+      style: size ? { width: `min(${size}px, 94vw)`, maxWidth: `min(${size}px, 94vw)` } : {},
+    });
 
     const finish = (value) => {
       dialog.close();

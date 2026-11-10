@@ -187,10 +187,20 @@ pub fn strip_game_name(title: &str, names: &[&str]) -> (String, bool) {
 }
 
 static VERSION: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?i)\bv?\d+[.;]\d+(?:[.;]\d+)*[a-z]?\b").unwrap());
+    LazyLock::new(|| Regex::new(r"(?i)\b(?:ver\.?\s?|v)?\d+[.;]\d+(?:[.;]\d+)*[a-z]?\b").unwrap());
 static EMPTY_BRACKETS: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"[\[(（【]\s*[\])）】]").unwrap());
 static SPACES: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\s{2,}").unwrap());
+
+fn drop_lost_brackets(text: &str) -> String {
+    let text = text.trim();
+    match text.strip_prefix('?') {
+        Some(inner) if inner.starts_with(char::is_alphanumeric) => {
+            inner.strip_suffix('?').unwrap_or(inner).trim().to_string()
+        }
+        _ => text.to_string(),
+    }
+}
 
 fn squash_spaces(text: &str) -> String {
     SPACES.replace_all(text, " ").into_owned()
@@ -213,6 +223,7 @@ pub fn parse(title: &str, game_name: &str, other_names: &[String], user: &[Rule]
     let remainder = squash(&remainder)
         .trim_matches(|c| STRIP_CHARS.contains(c))
         .to_string();
+    let remainder = drop_lost_brackets(&remainder);
     if loose(&remainder).is_empty() {
         return TitleInfo::default();
     }
@@ -367,6 +378,12 @@ mod tests {
             ("Game - Chapter 4", "Game", "Chapter 4"),
             ("Some English Title - Our Secret Base", "Japanese Title", ""),
             ("Unknown Title - Chapter 2", "Japanese Title", "Chapter 2"),
+            (
+                "Hamidashi Creative - Ver1.00 ?New Gacha Starts Today?",
+                "Hamidashi Creative",
+                "New Gacha Starts Today",
+            ),
+            ("Game - Is This Love?", "Game", "Is This Love?"),
         ];
         for (title, game, want) in cases {
             assert_eq!(
