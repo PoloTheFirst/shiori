@@ -15,8 +15,8 @@ function inSeason(today) {
 }
 
 export async function openRecap(year = recapYear()) {
-  const recap = await invoke("year_recap", { year });
-  await call("open_url", { url: recap.url });
+  const url = await invoke("recap_link", { year });
+  await call("open_url", { url });
 }
 
 export async function offerRecap(today = new Date()) {
@@ -49,7 +49,7 @@ export async function offerRecap(today = new Date()) {
     ],
   });
   if (open) {
-    await call("open_url", { url: recap.url });
+    await openRecap(year);
   }
   return true;
 }

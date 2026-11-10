@@ -247,6 +247,7 @@ fn main() {
             commands::share::copy_png,
             commands::share::save_png,
             commands::share::year_recap,
+            commands::share::recap_link,
             commands::app::preview_presence,
             commands::data::backup_default_name,
             commands::data::export_data,
