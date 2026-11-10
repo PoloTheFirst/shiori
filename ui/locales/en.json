@@ -40,6 +40,11 @@
         "Still reading? You're doing great~",
         "Don't forget to drink some water!",
         "I wonder what happens next... keep going!"
+      ],
+      "reading": [
+        "Already {total} on {name}! You're on a roll~",
+        "{session} of reading this session. Maybe a little break soon?",
+        "How's {name} going? I want to know what happens next!"
       ]
     },
     "tsundere": {
@@ -59,6 +64,11 @@
         "H-hey, you've been reading for a while. Not that I'm worried!",
         "Don't stay up too late, idiot.",
         "...Fine, this part is kind of good."
+      ],
+      "reading": [
+        "{total} on {name}... I-it's not like I'm counting for you!",
+        "You've been at it for {session}. Don't strain your eyes, idiot.",
+        "Hmph, {name} again? ...Fine, it's a good one."
       ]
     },
     "shy": {
@@ -78,6 +88,11 @@
         "U-um... I'm still here, reading with you...",
         "M-maybe a little stretch? ...Only if you want...",
         "This is nice... reading together..."
+      ],
+      "reading": [
+        "U-um... that's {total} on {name} now...",
+        "{session} already... m-maybe stretch a little?",
+        "I hope {name} is being nice to you..."
       ]
     },
     "big_sister": {
@@ -97,6 +112,11 @@
         "You've been at it for a while, sweetie. Proud of you~",
         "Remember to rest your eyes, okay?",
         "Ara~ So focused. Cute."
+      ],
+      "reading": [
+        "{total} on {name}, huh? I'm proud of you.",
+        "That's {session} in a row. Rest your eyes for a minute, okay?",
+        "Is {name} making you cry yet? Big sis is right here."
       ]
     },
     "chuuni": {
@@ -116,6 +136,11 @@
         "The tale deepens... I sense a great fate ahead!",
         "Mortal, your stamina impresses even me!",
         "My dark eye watches every line with you..."
+      ],
+      "reading": [
+        "{total} devoted to the forbidden tome {name}... impressive.",
+        "Your soul has been bound to the text for {session}!",
+        "The prophecy of {name} unfolds... read on, my vessel!"
       ]
     }
   },
@@ -849,6 +874,8 @@
     "Started: {names}": "Started: {names}",
     "started a VN": "started a VN",
     "finished a VN": "finished a VN",
+    "About the VN you're reading": "About the VN you're reading",
+    "{name}: the VN · {total}: time on it · {session}: this session.": "{name}: the VN · {total}: time on it · {session}: this session.",
     "Animation": "Animation",
     "Replay": "Replay",
     "Pop": "Pop",

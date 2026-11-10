@@ -40,6 +40,11 @@
         "¿Sigues leyendo? ¡Lo haces genial~!",
         "¡No olvides tomar algo de agua!",
         "Me pregunto qué pasará... ¡sigue!"
+      ],
+      "reading": [
+        "¡Ya llevas {total} en {name}! ¡Vas genial~!",
+        "{session} leyendo seguido. ¿Un descansito pronto?",
+        "¿Qué tal va {name}? ¡Quiero saber qué pasa después!"
       ]
     },
     "tsundere": {
@@ -59,6 +64,11 @@
         "O-oye, llevas un buen rato leyendo. ¡No es que me preocupe!",
         "No te acuestes muy tarde, tonto.",
         "...Vale, esta parte está bastante bien."
+      ],
+      "reading": [
+        "{total} en {name}... ¡N-no es que lo cuente por ti!",
+        "Llevas {session} leyendo. No te dañes la vista, tonto.",
+        "Hmph, ¿{name} otra vez? ...Vale, es bueno."
       ]
     },
     "shy": {
@@ -78,6 +88,11 @@
         "E-eh... sigo aquí, leyendo contigo...",
         "¿Q-quizás estirarte un poco? ...Solo si quieres...",
         "Qué bonito... leer juntos..."
+      ],
+      "reading": [
+        "E-esto... ya son {total} en {name}...",
+        "Ya {session}... ¿q-quizás estirarte un poco?",
+        "Espero que {name} te esté tratando bien..."
       ]
     },
     "big_sister": {
@@ -97,6 +112,11 @@
         "Llevas un buen rato, cariño. Estoy orgullosa de ti~",
         "Acuérdate de descansar la vista, ¿vale?",
         "Ara~ Qué concentrado. Qué mono."
+      ],
+      "reading": [
+        "{total} en {name}, ¿eh? Estoy orgullosa de ti.",
+        "Llevas {session} seguidas. Descansa la vista un minuto, ¿vale?",
+        "¿{name} ya te hizo llorar? Tu hermana mayor está aquí."
       ]
     },
     "chuuni": {
@@ -116,6 +136,11 @@
         "La historia se oscurece... ¡presiento un gran destino!",
         "¡Mortal, tu resistencia me impresiona!",
         "Mi ojo oscuro sigue cada línea contigo..."
+      ],
+      "reading": [
+        "{total} entregadas al tomo prohibido {name}... impresionante.",
+        "¡Tu alma lleva {session} atada al texto!",
+        "La profecía de {name} se revela... ¡sigue leyendo, mi elegido!"
       ]
     }
   },
@@ -848,6 +873,8 @@
     "Added {vns} from your VNDB list": "{vns} añadidas desde tu lista de VNDB",
     "Nothing new on your VNDB list": "Nada nuevo en tu lista de VNDB",
     "From your VNDB list": "Desde tu lista de VNDB",
+    "About the VN you're reading": "Sobre la VN que estás leyendo",
+    "{name}: the VN · {total}: time on it · {session}: this session.": "{name}: la VN · {total}: tiempo en ella · {session}: esta sesión.",
     "Animation": "Animación",
     "Replay": "Repetir",
     "Pop": "Pop",

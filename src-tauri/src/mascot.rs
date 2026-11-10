@@ -1108,13 +1108,7 @@ pub fn start_chatter(app: &AppHandle) {
         if minutes == 0 || now().saturating_sub(LAST_SAID.load(Ordering::SeqCst)) < minutes * 60 {
             continue;
         }
-        say_as(
-            &app,
-            None,
-            "chatter",
-            |lines| pick(&lines.chatter),
-            6,
-        );
+        say_or_talk_about_reading(&app, None, "chatter", |lines| &lines.chatter);
     });
 }
 
@@ -1276,14 +1270,56 @@ pub fn screenshot_saved(app: &AppHandle) {
     say_as(app, None, "screenshot", |lines| just(lines.screenshot.clone()), 3);
 }
 
+struct Reading {
+    name: String,
+    total: String,
+    session: String,
+}
+
+fn reading_now(app: &AppHandle) -> Option<Reading> {
+    let shared = shared(app);
+    let snap = shared.snapshot();
+    if !snap.detected || snap.idle || snap.paused || snap.game_name.is_empty() {
+        return None;
+    }
+    let language = lang::resolve(&shared.config.lock().unwrap().str("language"));
+    let session = if snap.session_start > 0 {
+        crate::config::now() - snap.session_start
+    } else {
+        0
+    };
+    Some(Reading {
+        name: snap.game_name,
+        total: crate::engine::format_playtime(snap.playtime_seconds, language),
+        session: crate::engine::format_playtime(session, language),
+    })
+}
+
+fn about_reading(reading: &Reading, line: &str) -> String {
+    line.replace("{name}", &reading.name)
+        .replace("{total}", &reading.total)
+        .replace("{session}", &reading.session)
+}
+
+fn say_or_talk_about_reading(app: &AppHandle, label: Option<&str>, event: &str, list: fn(&Lines) -> &Vec<String>) {
+    if let Some(reading) = reading_now(app).filter(|_| random(2) == 0) {
+        say_as(
+            app,
+            label,
+            "reading",
+            |lines| {
+                let said = pick(&lines.reading);
+                just(about_reading(&reading, &said.text))
+            },
+            6,
+        );
+        return;
+    }
+    say_as(app, label, event, |lines| pick(list(lines)), 6);
+}
+
 pub fn poke(app: &AppHandle, label: &str) {
-    say_as(
-        app,
-        Some(label),
-        "poke",
-        |lines| pick(&lines.pokes),
-        6,
-    );
+    say_or_talk_about_reading(app, Some(label), "poke", |lines| &lines.pokes);
 }
 
 pub fn react(app: &AppHandle, old: &Snapshot, new: &Snapshot) {

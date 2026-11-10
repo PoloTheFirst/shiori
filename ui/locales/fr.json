@@ -40,6 +40,11 @@
         "Toujours en train de lire ? Tu gères~",
         "N'oublie pas de boire un peu d'eau !",
         "Je me demande ce qui va se passer… continue !"
+      ],
+      "reading": [
+        "Déjà {total} sur {name} ! Tu es lancé~",
+        "{session} de lecture d'affilée. Une petite pause bientôt ?",
+        "Alors, {name}, ça avance ? Je veux savoir la suite !"
       ]
     },
     "tsundere": {
@@ -59,6 +64,11 @@
         "H-hé, ça fait un moment que tu lis. C'est pas que je m'inquiète !",
         "Te couche pas trop tard, idiot.",
         "…Bon, ce passage est pas mal."
+      ],
+      "reading": [
+        "{total} sur {name}... C-c'est pas comme si je comptais pour toi !",
+        "Ça fait {session} que tu lis. Abîme pas tes yeux, idiot.",
+        "Hmph, encore {name} ? ...Bon, il est bien, celui-là."
       ]
     },
     "shy": {
@@ -78,6 +88,11 @@
         "Euh… je suis toujours là, je lis avec toi…",
         "P-peut-être t'étirer un peu ? …Seulement si tu veux…",
         "C'est agréable… de lire ensemble…"
+      ],
+      "reading": [
+        "Euh... ça fait {total} sur {name} maintenant...",
+        "Déjà {session}... t-tu devrais peut-être t'étirer un peu ?",
+        "J'espère que {name} est gentil avec toi..."
       ]
     },
     "big_sister": {
@@ -97,6 +112,11 @@
         "Ça fait un moment que tu lis, mon chou. Je suis fière de toi~",
         "Pense à reposer tes yeux, d'accord ?",
         "Ara~ Si concentré. Trop mignon."
+      ],
+      "reading": [
+        "{total} sur {name}, hein ? Je suis fière de toi.",
+        "Ça fait {session} d'affilée. Repose tes yeux une minute, d'accord ?",
+        "{name} t'a déjà fait pleurer ? Grande sœur est là."
       ]
     },
     "chuuni": {
@@ -116,6 +136,11 @@
         "Le récit s'approfondit… je sens un grand destin approcher !",
         "Mortel, ton endurance m'impressionne !",
         "Mon œil maléfique suit chaque ligne avec toi…"
+      ],
+      "reading": [
+        "{total} consacrées au grimoire interdit {name}... impressionnant.",
+        "Ton âme est liée au texte depuis {session} !",
+        "La prophétie de {name} se dévoile... continue, mon élu !"
       ]
     }
   },
@@ -848,6 +873,8 @@
     "Added {vns} from your VNDB list": "{vns} ajoutés depuis ta liste VNDB",
     "Nothing new on your VNDB list": "Rien de nouveau dans ta liste VNDB",
     "From your VNDB list": "Depuis ta liste VNDB",
+    "About the VN you're reading": "Sur le VN que tu lis",
+    "{name}: the VN · {total}: time on it · {session}: this session.": "{name} : le VN · {total} : temps passé dessus · {session} : cette session.",
     "Animation": "Animation",
     "Replay": "Rejouer",
     "Pop": "Pop",

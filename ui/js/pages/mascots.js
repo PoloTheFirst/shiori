@@ -60,6 +60,7 @@ const LINE_FIELDS = [
 const LIST_FIELDS = [
   ["pokes", "When you click it"],
   ["chatter", "Now and then"],
+  ["reading", "About the VN you're reading", "{name}: the VN · {total}: time on it · {session}: this session."],
 ];
 
 const VOICE_MOMENTS = [
@@ -318,7 +319,7 @@ async function writeLines(item) {
       hint && el("span", { class: "small-text muted" }, hint),
     );
   });
-  const lists = LIST_FIELDS.map(([key, label]) => {
+  const lists = LIST_FIELDS.map(([key, label, hint]) => {
     inputs[key] = el("textarea", { rows: 4, placeholder: (defaults[key] || []).join("\n") });
     inputs[key].value = (saved[key] || []).join("\n");
     return el(
@@ -327,6 +328,7 @@ async function writeLines(item) {
       el("span", {}, label),
       inputs[key],
       el("span", { class: "small-text muted" }, "One per line, picked at random."),
+      hint && el("span", { class: "small-text muted" }, hint),
     );
   });
 

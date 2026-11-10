@@ -40,6 +40,11 @@
         "Vẫn đang đọc à? Giỏi lắm~",
         "Đừng quên uống nước nhé!",
         "Không biết chuyện gì sẽ xảy ra… đọc tiếp đi!"
+      ],
+      "reading": [
+        "Đã {total} với {name} rồi! Bạn đang rất hăng say~",
+        "Đọc liền {session} rồi. Sắp nghỉ một chút nhé?",
+        "{name} thế nào rồi? Mình muốn biết chuyện gì xảy ra tiếp!"
       ]
     },
     "tsundere": {
@@ -59,6 +64,11 @@
         "N-này, cậu đọc lâu rồi đấy. Không phải tớ lo đâu nhé!",
         "Đừng thức khuya quá, đồ ngốc.",
         "…Thôi được, đoạn này cũng hay."
+      ],
+      "reading": [
+        "{total} với {name}... K-không phải mình đếm giùm bạn đâu nhé!",
+        "Bạn đọc {session} rồi đó. Đừng làm hại mắt, đồ ngốc.",
+        "Hừm, lại {name} à? ...Được thôi, truyện hay mà."
       ]
     },
     "shy": {
@@ -78,6 +88,11 @@
         "Ư-ừm… tớ vẫn ở đây, đọc cùng cậu…",
         "D-duỗi người một chút nhé? …Nếu cậu muốn…",
         "Thật dễ chịu… khi đọc cùng nhau…"
+      ],
+      "reading": [
+        "Ư-ưm... đã {total} với {name} rồi...",
+        "Đã {session} rồi... b-bạn vươn vai chút nhé?",
+        "Mong là {name} đối xử tốt với bạn..."
       ]
     },
     "big_sister": {
@@ -97,6 +112,11 @@
         "Em đọc lâu rồi đó, cưng. Chị tự hào về em~",
         "Nhớ cho mắt nghỉ ngơi nhé?",
         "Ara~ Tập trung ghê. Dễ thương quá."
+      ],
+      "reading": [
+        "{total} với {name} rồi à? Chị tự hào về em.",
+        "Đã {session} liền rồi. Cho mắt nghỉ một phút nhé?",
+        "{name} làm em khóc chưa? Chị ở đây nè."
       ]
     },
     "chuuni": {
@@ -116,6 +136,11 @@
         "Câu chuyện ngày càng sâu… ta cảm nhận được định mệnh vĩ đại!",
         "Phàm nhân, sức bền của ngươi khiến ta kinh ngạc!",
         "Con mắt bóng tối của ta dõi theo từng dòng cùng ngươi…"
+      ],
+      "reading": [
+        "{total} hiến dâng cho cấm thư {name}... ấn tượng đấy.",
+        "Linh hồn ngươi đã bị trói vào trang sách suốt {session}!",
+        "Lời tiên tri của {name} đang hé lộ... đọc tiếp đi, kẻ được chọn!"
       ]
     }
   },
@@ -848,6 +873,8 @@
     "Added {vns} from your VNDB list": "Đã thêm {vns} từ danh sách VNDB",
     "Nothing new on your VNDB list": "Không có gì mới trong danh sách VNDB",
     "From your VNDB list": "Từ danh sách VNDB",
+    "About the VN you're reading": "Về VN bạn đang đọc",
+    "{name}: the VN · {total}: time on it · {session}: this session.": "{name}: tên VN · {total}: thời gian đã đọc · {session}: phiên này.",
     "Animation": "Hiệu ứng",
     "Replay": "Phát lại",
     "Pop": "Bật lên",
