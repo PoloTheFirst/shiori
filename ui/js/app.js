@@ -4,7 +4,9 @@ import { store, update, subscribe } from "./store.js";
 import { show } from "./router.js";
 import { resolveTheme, applyPalette } from "./themes.js";
 import { applyBackground } from "./background.js";
-import { call, toast } from "./ui.js";
+import { call, setCover, toast } from "./ui.js";
+import { formatPlaytime } from "./format.js";
+import { openSearch } from "./labs/search.js";
 import { offerUpdate } from "./components/update.js";
 import { offerRecap } from "./components/recap.js";
 import { watchNewVns } from "./components/new-vn.js";
@@ -56,6 +58,35 @@ for (const button of $$("nav button")) {
 }
 
 $("#pause-btn").onclick = () => call("set_paused", { paused: !store.snapshot.paused });
+$("#top-pause").onclick = () => call("set_paused", { paused: !store.snapshot.paused });
+$("#now-chip").onclick = () => show("home");
+$("#top-search").onclick = () => openSearch();
+$("#content").addEventListener("scroll", () => $(".topbar").classList.toggle("scrolled", $("#content").scrollTop > 4), { passive: true });
+
+let chipCover = "";
+
+function renderTopbar(snap) {
+  const reading = !!snap.detected;
+  $("#top-pause-label").textContent = snap.paused ? t("Resume") : t("Pause");
+  $("#top-pause").classList.toggle("paused", !!snap.paused);
+  $("#top-game").className = "status-dot" + (reading ? " ok" : "");
+  $("#now-chip").hidden = !reading;
+  $("#topbar-idle").hidden = reading;
+  $("#topbar-idle").textContent = snap.paused ? t("Paused: nothing is shared.") : t("Waiting for a visual novel");
+  if (!reading) {
+    return;
+  }
+  $("#now-chip").classList.toggle("idle", !!snap.idle);
+  $("#now-chip-label").textContent = snap.idle ? t("Idle") : t("Now reading");
+  $("#now-chip-name").textContent = snap.game_name;
+  $("#now-chip-time").textContent = formatPlaytime(snap.playtime_seconds || 0);
+  const cover = snap.cover || {};
+  const id = `${cover.local_path}|${snap.game_name}|${!!cover.nsfw}`;
+  if (id !== chipCover) {
+    chipCover = id;
+    setCover($("#now-chip-cover"), { path: cover.local_path, nsfw: cover.nsfw, label: snap.game_name });
+  }
+}
 
 function renderSidebar() {
   const snap = store.snapshot;
@@ -63,12 +94,15 @@ function renderSidebar() {
   $("#pause-btn").classList.toggle("paused", !!snap.paused);
   $("#pause-btn").title = snap.paused ? t("Resume") : t("Pause");
   $("#pill-game").className = "pill" + (snap.detected ? " ok" : "");
+  renderTopbar(snap);
 }
 
 function renderDiscordPill() {
   const status = store.status;
   $("#pill-discord").className = "pill " + (status.discord_ok ? "ok" : "bad");
   $("#pill-discord").title = status.discord_msg || "";
+  $("#top-discord").className = "status-dot " + (status.discord_ok ? "ok" : "bad");
+  $("#top-discord").title = `Discord: ${t(status.discord_msg || "connecting…")}`;
 }
 
 subscribe("snapshot", renderSidebar);

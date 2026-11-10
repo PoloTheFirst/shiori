@@ -435,6 +435,12 @@ function appSection() {
 
   return [
     section("App"),
+    toggle(
+      el("span", {}, "Top bar", " ", el("span", { class: "labs-tag" }, "beta")),
+      store.settings.labs_topbar !== false,
+      (on) => save({ labs_topbar: on }),
+      "Shows the VN you're reading, the search, the status and Pause at the top.",
+    ),
     setting("start_minimized", "Start minimized to the tray"),
     autostart,
     setting(

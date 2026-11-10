@@ -11,6 +11,10 @@ function close() {
   overlay = null;
 }
 
+export async function openSearch() {
+  return open();
+}
+
 async function open() {
   close();
   const input = el("input", { type: "search", placeholder: "Search a VN or a page…" });
