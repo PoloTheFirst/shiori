@@ -29,6 +29,7 @@ const TEMPLATE = `
           <button data-v="grid" role="menuitemradio">Grid</button>
           <button data-v="compact" role="menuitemradio">Compact</button>
           <button data-v="shelves" role="menuitemradio">Shelves</button>
+          <button data-v="years" role="menuitemradio">Shelves by year</button>
         </div>
       </div>
       <input type="search" data-id="filter" placeholder="Filter…" />
@@ -36,10 +37,15 @@ const TEMPLATE = `
   </div>
 
   <div class="page-head lib-tools">
-    <div class="seg" data-id="sort">
-      <button data-v="most">Most read</button>
-      <button data-v="recent">Recent</button>
-      <button data-v="az">A–Z</button>
+    <div class="seg sort-bar">
+      <div class="sort-options" data-id="sort">
+        <button data-v="most">Most read</button>
+        <button data-v="recent">Recent</button>
+        <button data-v="az">A–Z</button>
+        <button data-v="release">Release date</button>
+      </div>
+      <span class="sort-sep"></span>
+      <button class="sort-dir" data-id="reverse" title="Reverse order"></button>
     </div>
     <div class="row">
       <button class="btn secondary" data-id="wishlist">Random from wishlist</button>
@@ -70,7 +76,10 @@ const SORTERS = {
   most: (a, b) => b.playtime - a.playtime,
   recent: (a, b) => b.last_played - a.last_played,
   az: (a, b) => a.name.localeCompare(b.name),
+  release: (a, b) => b.released.localeCompare(a.released),
 };
+
+const yearOf = (game) => (/^\d{4}/.test(game.released) ? game.released.slice(0, 4) : "");
 
 const SHELVES = [
   ["playing", "Reading"],
@@ -85,10 +94,12 @@ const VIEWS = {
   grid: (shown) => shown.map(tile),
   compact: (shown) => [compactHead(), ...shown.map(line)],
   shelves: (shown) => shelves(shown),
+  years: (shown) => yearShelves(shown),
 };
 
 let root;
 let games = [];
+let datesAsked = false;
 
 const part = (id) => $(`[data-id="${id}"]`, root);
 
@@ -98,7 +109,12 @@ function build(container) {
 
   part("filter").oninput = render;
   part("status").onchange = render;
-  part("wishlist").onclick = () => show("wishlist");
+  part("wishlist").onclick = () => show("vndb-lists");
+  part("reverse").onclick = () => {
+    store.settings.library_sort_reverse = !store.settings.library_sort_reverse;
+    render();
+    call("update_settings", { changes: { library_sort_reverse: store.settings.library_sort_reverse } });
+  };
 
   part("view-button").onclick = () => (part("view-list").hidden = !part("view-list").hidden);
   for (const item of part("view-list").children) {
@@ -231,12 +247,25 @@ function render() {
     }
   }
 
+  const reverse = !!store.settings.library_sort_reverse;
+  part("reverse").textContent = reverse ? "↑" : "↓";
+  if (!datesAsked && (sort === "release" || view === "years") && games.some((game) => game.vndb_id && !game.released)) {
+    datesAsked = true;
+    call("fill_release_dates").catch(() => {});
+  }
+
   const filter = part("filter").value.trim().toLowerCase();
   const status = part("status").value;
   const shown = games
     .filter((game) => !filter || game.name.toLowerCase().includes(filter))
     .filter((game) => !status || game.status === status)
     .sort(SORTERS[sort]);
+  if (reverse) {
+    shown.reverse();
+  }
+  if (sort === "release") {
+    shown.sort((a, b) => !yearOf(a) - !yearOf(b));
+  }
 
   const total = games.reduce((sum, game) => sum + game.playtime, 0);
   const week = games.reduce((sum, game) => sum + weekSeconds(game.daily), 0);
@@ -380,16 +409,30 @@ function line(game) {
 function shelves(shown) {
   return SHELVES.map(([status, title]) => {
     const group = shown.filter((game) => (game.status || "") === status);
-    if (!group.length) {
-      return null;
-    }
-    return el(
-      "div",
-      { class: "shelf" },
-      el("div", { class: "shelf-title" }, el("b", {}, title), el("span", { class: "muted" }, String(group.length))),
-      el("div", { class: "shelf-row" }, group.map(tile)),
-    );
+    return group.length ? shelf(title, group) : null;
   }).filter(Boolean);
+}
+
+function shelf(title, group) {
+  return el(
+    "div",
+    { class: "shelf" },
+    el("div", { class: "shelf-title" }, el("b", {}, title), el("span", { class: "muted" }, String(group.length))),
+    el("div", { class: "shelf-row" }, group.map(tile)),
+  );
+}
+
+function yearShelves(shown) {
+  const years = [...new Set(shown.map(yearOf).filter(Boolean))].sort().reverse();
+  if (store.settings.library_sort_reverse) {
+    years.reverse();
+  }
+  return [...years, ""]
+    .map((year) => {
+      const group = shown.filter((game) => yearOf(game) === year);
+      return group.length ? shelf(year || t("Unknown year"), group) : null;
+    })
+    .filter(Boolean);
 }
 
 register({

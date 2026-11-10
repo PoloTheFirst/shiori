@@ -261,6 +261,25 @@ impl Vndb {
         Ok(Some(VnResult::from_api(&first)))
     }
 
+    pub fn release_dates(&self, ids: &[String]) -> Result<Vec<(String, String)>, String> {
+        let mut out = Vec::new();
+        for chunk in ids.chunks(100) {
+            let mut filters = vec![json!("or")];
+            filters.extend(chunk.iter().map(|id| json!(["id", "=", vn_id(id)])));
+            let filters = if chunk.len() == 1 {
+                filters[1].clone()
+            } else {
+                Value::Array(filters)
+            };
+            let body = json!({"filters": filters, "fields": "released", "results": 100});
+            let data = self.post("/vn", &body)?;
+            for vn in data["results"].as_array().into_iter().flatten() {
+                out.push((text(&vn["id"]), text(&vn["released"])));
+            }
+        }
+        Ok(out)
+    }
+
     pub fn description(&self, id: &str) -> Result<String, String> {
         let id = vn_id(id);
         let cache = self.cache_dir.join(format!("desc_{id}.json"));

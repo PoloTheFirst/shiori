@@ -217,6 +217,7 @@ fn main() {
             commands::library::set_playtime,
             commands::library::remove_game,
             commands::library::confirm_match,
+            commands::library::fill_release_dates,
             commands::library::match_checked,
             commands::library::import_vndb_finished,
             commands::library::recommendations,

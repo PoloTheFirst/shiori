@@ -78,11 +78,56 @@ pub fn get_library(shared: SharedState) -> Vec<Value> {
                 "has_path": !launcher::launch_exe(&entry).is_empty(),
                 "from_vndb": entry.get("vndb_list_only").and_then(Value::as_bool).unwrap_or(false)
                     && launcher::launch_exe(&entry).is_empty(),
+                "released": if text(&entry, "released_vn") == vn_id { text(&entry, "released") } else { String::new() },
                 "vndb_id": vn_id,
                 "cover": cover_of(&cfg, &entry),
             })
         })
         .collect()
+}
+
+#[tauri::command]
+pub async fn fill_release_dates(shared: SharedState<'_>) -> Result<usize, String> {
+    let shared = Arc::clone(&shared);
+    blocking(move || {
+        let missing: Vec<(String, String)> = {
+            let cfg = shared.config.lock().unwrap();
+            visible_games(&cfg)
+                .into_iter()
+                .filter_map(|(key, entry)| {
+                    let vn_id = [text(&entry, "vndb_id"), text(&entry, "matched_vndb_id")]
+                        .into_iter()
+                        .find(|id| !id.is_empty())?;
+                    (text(&entry, "released_vn") != vn_id).then_some((key, vn_id))
+                })
+                .collect()
+        };
+        if missing.is_empty() {
+            return Ok(0);
+        }
+        let mut ids: Vec<String> = missing.iter().map(|(_, id)| id.clone()).collect();
+        ids.sort();
+        ids.dedup();
+        let dates: std::collections::HashMap<String, String> =
+            shared.vndb.release_dates(&ids)?.into_iter().collect();
+        {
+            let mut cfg = shared.config.lock().unwrap();
+            for (key, vn_id) in &missing {
+                let date = dates.get(vn_id).cloned().unwrap_or_default();
+                cfg.set_game(
+                    key,
+                    Map::from_iter([
+                        ("released".into(), json!(date)),
+                        ("released_vn".into(), json!(vn_id)),
+                    ]),
+                );
+            }
+        }
+        shared.send(Cmd::Reload);
+        shared.emit("library-changed", json!({}));
+        Ok(missing.len())
+    })
+    .await
 }
 
 #[tauri::command(async)]

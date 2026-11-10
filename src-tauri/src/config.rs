@@ -23,6 +23,7 @@ fn defaults() -> Map<String, Value> {
         "presence_language": "app",
         "library_view": "list",
         "library_sort": "most",
+        "library_sort_reverse": false,
         "screenshots_view": "right",
         "screenshots_order": "game",
         "background_image": "",
