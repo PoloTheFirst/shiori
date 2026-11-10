@@ -808,3 +808,9 @@ button.chip:hover,
   justify-items: start;
   min-width: 0;
 }
+
+.delete-list ul {
+  margin: 0 0 10px;
+  padding-left: 20px;
+  line-height: 1.7;
+}

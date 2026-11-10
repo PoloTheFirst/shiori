@@ -215,14 +215,18 @@ pub fn set_playtime(shared: SharedState, key: String, seconds: i64) {
     shared.emit("library-changed", json!({ "key": key }));
 }
 
-#[tauri::command(async)]
-pub fn remove_game(shared: SharedState, key: String) -> Result<(), String> {
+fn forget_game(shared: &Shared, key: &str, with_files: bool) -> Result<usize, String> {
     let snap = shared.snapshot();
     if snap.detected && snap.key == key {
         return Err("Close the game before removing it.".into());
     }
-    {
+    let files = {
         let mut cfg = shared.config.lock().unwrap();
+        let files = if with_files {
+            cfg.files_of(key)
+        } else {
+            vec![]
+        };
         if let Some(id) = key.strip_prefix(vndb_list::IMPORTED_PREFIX) {
             let mut ignored = cfg
                 .get("vndb_import_ignored")
@@ -230,12 +234,30 @@ pub fn remove_game(shared: SharedState, key: String) -> Result<(), String> {
                 .cloned()
                 .unwrap_or_default();
             ignored.push(json!(id));
-            let _ = cfg.update(Map::from_iter([("vndb_import_ignored".into(), json!(ignored))]));
+            let _ = cfg.update(Map::from_iter([(
+                "vndb_import_ignored".into(),
+                json!(ignored),
+            )]));
         }
-        cfg.remove_game(&key);
-    }
-    changed(&shared, &key);
-    Ok(())
+        cfg.remove_game(key);
+        files
+    };
+    let removed = files
+        .iter()
+        .filter(|file| std::fs::remove_file(file).is_ok())
+        .count();
+    changed(shared, key);
+    Ok(removed)
+}
+
+#[tauri::command(async)]
+pub fn remove_game(shared: SharedState, key: String) -> Result<(), String> {
+    forget_game(&shared, &key, false).map(|_| ())
+}
+
+#[tauri::command(async)]
+pub fn delete_game(shared: SharedState, key: String) -> Result<usize, String> {
+    forget_game(&shared, &key, true)
 }
 
 #[tauri::command]
