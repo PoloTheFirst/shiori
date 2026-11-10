@@ -44,8 +44,13 @@ pub fn update_settings(
         let normalized = hotkey::normalize(key);
         changes.insert("screenshot_hotkey".into(), json!(normalized));
     }
-    const NOT_ON_SCREEN: [&str; 3] =
-        ["mascot_chatter_minutes", "mascot_voice_volume", "mascot_click_hotkey"];
+    const NOT_ON_SCREEN: [&str; 5] = [
+        "mascot_chatter_minutes",
+        "mascot_balloons",
+        "mascot_voice_volume",
+        "mascot_voice_volumes",
+        "mascot_click_hotkey",
+    ];
     crate::crash::note(format!(
         "settings: {}",
         changes.keys().cloned().collect::<Vec<_>>().join(", ")

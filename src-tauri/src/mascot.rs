@@ -1002,7 +1002,14 @@ fn say_as(
         (
             cfg.get("mascot_talk").and_then(Value::as_bool).unwrap_or(true),
             lang::resolve(&cfg.str("language")),
-            cfg.get("mascot_voice_volume").and_then(Value::as_u64).unwrap_or(80),
+            cfg.get("mascot_voice_volume").and_then(Value::as_u64).unwrap_or(80)
+                * cfg
+                    .get("mascot_voice_volumes")
+                    .and_then(|v| v.get(id_of(&label)))
+                    .and_then(Value::as_u64)
+                    .unwrap_or(100)
+                    .min(100)
+                / 100,
         )
     };
     let said = line(&lines_for(&shared, id_of(&label), language));

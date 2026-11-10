@@ -355,23 +355,45 @@ async function writeLines(item) {
 
 const fileName = (path) => path.split(/[\\/]/).pop();
 
+const mascotVolume = (id) => store.settings.mascot_voice_volumes?.[id] ?? 100;
+
 let preview = null;
-function playPreview(path) {
+function playPreview(path, id) {
   preview?.pause();
   preview = new Audio(fileUrl(path));
-  preview.volume = (store.settings.mascot_voice_volume ?? 80) / 100;
+  preview.volume = ((store.settings.mascot_voice_volume ?? 80) / 100) * (mascotVolume(id) / 100);
   preview.play().catch(() => {});
+}
+
+function voiceVolume(item) {
+  const range = el("input", { type: "range", min: 0, max: 100, step: 5, value: mascotVolume(item.id) });
+  const label = el("span", { class: "muted", style: { width: "44px", textAlign: "right" } });
+  const show = () => (label.textContent = Number(range.value) ? `${range.value}%` : t("Off"));
+  range.oninput = show;
+  range.onchange = async () => {
+    const volumes = { ...(store.settings.mascot_voice_volumes || {}), [item.id]: Number(range.value) };
+    store.settings.mascot_voice_volumes = volumes;
+    await call("update_settings", { changes: { mascot_voice_volumes: volumes } });
+  };
+  show();
+  return el(
+    "div",
+    { class: "field" },
+    el("span", {}, "This mascot's volume"),
+    el("div", { class: "row" }, range, label),
+  );
 }
 
 async function editVoices(item) {
   const body = el("div", { class: "line-fields" });
+  const volume = voiceVolume(item);
 
   const render = async () => {
     const voices = await call("mascot_voices", { id: item.id });
     const rows = VOICE_MOMENTS.map(([moment, label]) => {
       const files = (voices[moment] || []).map((path) => {
         const play = el("button", { class: "btn secondary small", title: "Play" }, "▶");
-        play.onclick = () => playPreview(path);
+        play.onclick = () => playPreview(path, item.id);
         const remove = el("button", { class: "btn danger small", title: "Remove" }, "✕");
         remove.onclick = async () => {
           await call("remove_mascot_voice", { path });
@@ -406,6 +428,7 @@ async function editVoices(item) {
           "with the lines in order: the 1st sound (by file name) with the 1st line, and so on. " +
           "Elsewhere, one is picked at random.",
       ),
+      volume,
       ...rows,
     );
   };
