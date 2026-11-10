@@ -14,7 +14,6 @@ import { presenceBuilder } from "./presence.js";
 const TEMPLATE = `
   <div class="page-head">
     <h2>Settings</h2>
-    <div data-id="discord-slot"></div>
   </div>
 
   <div class="card">
@@ -30,7 +29,8 @@ const TEMPLATE = `
 
   <div class="settings-footer">
     <span class="muted" data-id="version"></span>
-    <div class="row">
+    <div class="row" data-id="footer-actions">
+      <button class="btn secondary small" data-id="whats-new">What's new</button>
       <button class="btn secondary small" data-id="check-update">Check for updates</button>
     </div>
   </div>
@@ -85,7 +85,8 @@ function buildFooter() {
     check.textContent = t("Check for updates");
   };
 
-  part("discord-slot").append(discordButton());
+  part("whats-new").onclick = () => show("whatsnew", { recent: 5 });
+  part("whats-new").before(discordButton({ small: true }));
 }
 
 async function save(changes) {
@@ -430,9 +431,6 @@ function appSection() {
     store.autostart = on;
   });
 
-  const whatsNew = el("button", { class: "btn secondary" }, "What's new");
-  whatsNew.onclick = () => show("whatsnew", { recent: 5 });
-
   return [
     section("App"),
     toggle(
@@ -449,16 +447,6 @@ function appSection() {
       t("Version {version}. New GitHub releases are offered when the app starts.", {
         version: store.version,
       }),
-    ),
-    el(
-      "div",
-      { class: "row" },
-      whatsNew,
-      el(
-        "span",
-        { class: "muted small-text" },
-        t("Version {version}: the notes of the last few releases.", { version: store.version }),
-      ),
     ),
   ];
 }
