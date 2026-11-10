@@ -13,3 +13,4 @@ tools/symbolize/Cargo.lock
 wrapped/
 RENAME.txt
 shiori/
+video/
